@@ -4,7 +4,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #project name
 project(fcpu)
 
-
 #--------target--------#
 
-add_executable(${PROJECT_NAME} "src/main.c")
+include_directories(src)
+set(src "src/arena.c" "src/app.c")
+
+add_executable(${PROJECT_NAME} "src/main.c" ${src})
