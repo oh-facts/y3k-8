@@ -7,6 +7,6 @@ project(fcpu)
 #--------target--------#
 
 include_directories(src)
-set(src "src/arena.c" "src/app.c")
+set(src "src/computer.c")
 
 add_executable(${PROJECT_NAME} "src/main.c" ${src})

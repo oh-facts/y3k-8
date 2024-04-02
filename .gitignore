@@ -1,5 +1,1 @@
-.out*
-compile_commands.json
-.cache*
-.vscode*
-build
+bin/
