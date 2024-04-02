@@ -34,7 +34,7 @@ void lex_tokens(char* data)
         {
             case 'm':
             {
-                // >:) I know that my registers are 4 characters at best
+                // >:) I know that my opcodes are 4 characters at best
                 char* peek = current;
                 for(i32 i = 0; i < 4; i ++)
                 {
