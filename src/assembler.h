@@ -137,7 +137,7 @@ void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     lexi->tokens = tokens;
     lexi->num_tokens = num_tokens;
 
-    print_tokens(lexi);
+    //print_tokens(lexi);
 }
 
 struct parser
@@ -148,4 +148,34 @@ struct parser
 void parse_tokens(struct parser* parser, struct lexer* lexi)
 {
 
+}
+
+struct assembler
+{
+    i32 temp;
+    u8 bin[100];
+};
+
+void assemble()
+{
+    u8 code[256] = {
+    movv, r1 , 0x11,
+    movv, r2 , 0x22,
+    addr, r1 , r2,
+    halt
+    };
+     FILE *file;
+    file = fopen("data.bin", "wb");
+    if (file == NULL) {
+        fprintf(stderr, "Failed to open file\n");
+        return;
+    }
+
+    // Write data to the file
+    fwrite(code, sizeof(u8), sizeof(code) / sizeof(u8), file);
+
+    // Close the file
+    fclose(file);
+
+    //ass->bin = 
 }

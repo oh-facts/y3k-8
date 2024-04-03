@@ -51,7 +51,7 @@ inline u8 fetch(struct Computer *self)
 
 inline void next(struct Computer *self)
 {
-    self->reg[ip] +=1;
+    self->reg[ip] ++;
 }
 
 inline void set(struct Computer* self, u8 reg, u8 value)
@@ -132,9 +132,3 @@ internal void print_registers(struct Computer* self)
         printl("%s : 0x%02x",registers_str[i], self->reg[i]);
     }
 }
-
-void app_innit(struct Computer *self, u8 *base);
-
-void app_load_program(struct Computer* self, const u8* program, u32 num);
-
-void app_free(struct Computer *self);

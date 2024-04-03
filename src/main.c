@@ -61,8 +61,7 @@ int main(int argc, char *argv[])
 {
   printf("beep boop beep\n");
 
-  struct Computer comp = {0};
-
+ 
   size_t mem_size = Megabytes(16);
   struct Arena arena;
   arena_innit(&arena, mem_size, calloc(mem_size,sizeof(u8)));
@@ -72,26 +71,26 @@ int main(int argc, char *argv[])
   lex_tokens(data, &lexi, &arena);
   print_tokens(&lexi);
 
-
-
-  /*
-  app_innit(&comp, push_array(&arena, u8, 256));
   
+  assemble();
+  u8* code = yk_read_binary_file("data.bin",&arena);
+  
+  struct Computer comp = {0};
+
+  comp.ram = code;
+   /*
   u8 code[256] = {
     movv, r1 , 0x11,
     movv, r2 , 0x22,
     addr, r1 , r2,
     hlt
   };
-
-  code[255] = 0x69;
-
-  app_load_program(&comp, code,256);
-
+*/
+  
   execute(&comp);
 
   print_registers(&comp);
 
   printf("exited\n");
-  */
+  
 }
