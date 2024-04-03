@@ -1,11 +1,14 @@
+
+// lexer, then parser, then assembler
+
 #define CHAR_TO_INT(c) ((c) - '0')
 
 enum token_type
 {
     tk_invalid,
-    tk_whitespace,
     tk_op,
     tk_reg,
+    tk_lit,
     tk_num
 };
 
@@ -13,7 +16,7 @@ typedef enum token_type token_type;
 
 global char* token_type_str[tk_num] = 
 {
-    "INVALID","WHITESPACE","OP","REGISTER"
+    "INVALID", "OP","REGISTER", "LITERAL"
 };
 
 struct token
@@ -22,17 +25,44 @@ struct token
     char lexeme[5];
 };
 
-void lex_tokens(char* data)
+struct lexer
+{
+    struct token* tokens;
+    u32 num_tokens;
+};
+
+#include <math.h>
+#include <ctype.h>
+
+void print_tokens(struct lexer* lexi)
+{
+    for(i32 i = 0; i < lexi->num_tokens; i ++)
+    {
+        printf("%d %s %s\n", i, token_type_str[lexi->tokens[i].type], lexi->tokens[i].lexeme);
+    }
+}
+
+void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 {
     char* current = &data[0];
+
+    struct token* tokens = push_array(arena, struct token, 10);
     u32 num_tokens = 0;
-    struct token tokens[10] = {0};
 
     while(true)
     {
+        
         switch(*current)
         {
+            // add<x>, mov<x>, halt
+            // i want to get the assembler up and running, so I won't be doing
+            // much validation. If your opcode starts with the same letter as 
+            // something that already exists, its valid. If its bigger or smaller
+            // than 4 letters, severe problems can happen. That is for future me
+            // to care about.
+            case 'a':
             case 'm':
+            case 'h':
             {
                 // >:) I know that my opcodes are 4 characters at best
                 char* peek = current;
@@ -58,17 +88,44 @@ void lex_tokens(char* data)
                 current +=2; 
                 num_tokens++;
             }break;
+            // fall through
+            case '\n':
             case ' ':
             {
-                tokens[num_tokens].type = tk_whitespace;
-                tokens[num_tokens].lexeme[0] = ' ';  
+
                 current++;
-                num_tokens++;
             }break;
 
             default:
             {
-                goto exit;
+                if(isdigit(*current))
+                {
+                    //ToDo(facts): hexadecimal support. check for 0x
+                    tokens[num_tokens].type = tk_lit;
+                    
+                    char* peek = current;
+                    i32 len = 0;
+
+                    while(true)
+                    {
+                        tokens[num_tokens].lexeme[len] = *peek;
+                        len ++;
+
+                        if(!isdigit(*(++peek)))
+                        {
+                            break;
+                        }
+                    }
+                    num_tokens++;
+                    
+                    
+                    //printf("%d\n",num);
+                    current += len;
+                }
+                else
+                {
+                    goto exit;
+                }
 
             }break;
             
@@ -77,9 +134,18 @@ void lex_tokens(char* data)
     }
     exit:
 
-    for(i32 i = 0; i < num_tokens; i ++)
-    {
-        printf("%d %s %s\n", i, token_type_str[tokens[i].type], tokens[i].lexeme);
-    }
+    lexi->tokens = tokens;
+    lexi->num_tokens = num_tokens;
+
+    print_tokens(lexi);
+}
+
+struct parser
+{
+    i32 temp;
+};
+
+void parse_tokens(struct parser* parser, struct lexer* lexi)
+{
 
 }

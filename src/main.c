@@ -68,7 +68,12 @@ int main(int argc, char *argv[])
   arena_innit(&arena, mem_size, calloc(mem_size,sizeof(u8)));
   char* data =  yk_read_text_file("eep.fasm",&arena);
   
-  lex_tokens(data);
+  struct lexer lexi = {0};
+  lex_tokens(data, &lexi, &arena);
+  print_tokens(&lexi);
+
+
+
   /*
   app_innit(&comp, push_array(&arena, u8, 256));
   

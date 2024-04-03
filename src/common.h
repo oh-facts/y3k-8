@@ -54,7 +54,7 @@ typedef double f64;
 /*
 Meant to be used as booleans
 */
-typedef int8_t b8;
+typedef int32_t b32;
 
 #define true 1
 #define false 0

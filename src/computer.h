@@ -1,6 +1,3 @@
-#ifndef COMPUTER_H
-#define COMPUTER_H
-
 #include <common.h>
 
 enum registers
@@ -38,18 +35,7 @@ enum opcode
     movr,
     addv,
     addr,
-    hlt
-};
-
-struct Platform
-{
-    void* main;
-    void* scratch;
-
-    size_t mem_size;
-    size_t scratch_size;
-
-    u8*  (*read_file)(const char* filename, struct Arena* arena);
+    halt
 };
 
 struct Computer
@@ -127,7 +113,7 @@ inline void execute(struct Computer *self)
                 
             }break;
 
-            case hlt:
+            case halt:
             {
                 return;
             }break;
@@ -152,5 +138,3 @@ void app_innit(struct Computer *self, u8 *base);
 void app_load_program(struct Computer* self, const u8* program, u32 num);
 
 void app_free(struct Computer *self);
-
-#endif
