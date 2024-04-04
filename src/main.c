@@ -69,27 +69,29 @@ int main(int argc, char *argv[])
   
   struct lexer lexi = {0};
   lex_tokens(data, &lexi, &arena);
-  print_tokens(&lexi);
+  //print_tokens(&lexi);
 
+  struct parser parser = {0};
+  parse_tokens(&parser, &lexi);
   
-  assemble();
-  u8* code = yk_read_binary_file("data.bin",&arena);
+  //assemble();
+  //u8* code = yk_read_binary_file("data.bin",&arena);
   
-  struct Computer comp = {0};
+  //struct Computer comp = {0};
 
-  comp.ram = code;
+  //comp.ram = code;
    /*
   u8 code[256] = {
     movv, r1 , 0x11,
     movv, r2 , 0x22,
     addr, r1 , r2,
-    hlt
+    hlt 
   };
 */
   
-  execute(&comp);
+  //execute(&comp);
 
-  print_registers(&comp);
+  //print_registers(&comp);
 
   printf("exited\n");
   

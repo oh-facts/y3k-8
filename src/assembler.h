@@ -1,5 +1,6 @@
 
 // lexer, then parser, then assembler
+#include <language.h>
 
 #define CHAR_TO_INT(c) ((c) - '0')
 
@@ -9,6 +10,7 @@ enum token_type
     tk_op,
     tk_reg,
     tk_lit,
+    tk_terminate,
     tk_num
 };
 
@@ -54,7 +56,7 @@ void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
         
         switch(*current)
         {
-            // add<x>, mov<x>, halt
+            // add<x>, mov<x>
             // i want to get the assembler up and running, so I won't be doing
             // much validation. If your opcode starts with the same letter as 
             // something that already exists, its valid. If its bigger or smaller
@@ -62,7 +64,6 @@ void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
             // to care about.
             case 'a':
             case 'm':
-            case 'h':
             {
                 // >:) I know that my opcodes are 4 characters at best
                 char* peek = current;
@@ -133,6 +134,8 @@ void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
         }
     }
     exit:
+    tokens[num_tokens].type = tk_terminate;
+    num_tokens++;
 
     lexi->tokens = tokens;
     lexi->num_tokens = num_tokens;
@@ -140,14 +143,147 @@ void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     //print_tokens(lexi);
 }
 
+enum NODE_TYPE
+{
+    NODE_INVALID,
+    NODE_INSTR,
+    NODE_LITERAL,
+    NODE_REGISTER,
+};
+
+typedef enum NODE_TYPE NODE_TYPE;
+
+global const char* node_type_str[] = 
+{
+    "invalid", "instruction", "literal", "register"
+};
+
+struct Node;
+
+struct InstrNode
+{
+    struct token opcode;
+    struct Node* param1;
+    struct Node* param2;
+};
+
+struct Node
+{
+    NODE_TYPE type;
+    union
+    {
+        struct InstrNode instrNode;
+        u8 literal;
+        struct token reg;
+    };
+};
+
 struct parser
 {
-    i32 temp;
+    struct Node nodes[20];
+    i32 num_nodes;
 };
+
+void print_node(struct Node* node)
+{
+    switch(node->type)
+    {
+        case NODE_INVALID:
+        {
+            printl("invalid node");
+        }break;
+        case NODE_INSTR:
+        {
+
+            printl("Opcode: %s %s", token_type_str[node->instrNode.opcode.type], 
+            node->instrNode.opcode.lexeme);
+
+            printf("Arg1:");
+            print_node(node->instrNode.param1);
+
+            printf("Arg2:");
+            print_node(node->instrNode.param2);
+            printf("\n");
+
+        }break;
+        case NODE_REGISTER:
+        {
+            printl("%s", node->reg.lexeme);
+        }break;
+        case NODE_LITERAL:
+        {
+            printl("%d", node->literal);
+        }break;
+
+        default:
+        {
+            printl("ooga booga why is control here");
+        }
+    }
+}
+
+void print_nodes(struct parser* parser)
+{
+    for(i32 i = 0; i < parser->num_nodes; i ++)
+    {
+        print_node(&parser->nodes[i]);
+    }
+}
 
 void parse_tokens(struct parser* parser, struct lexer* lexi)
 {
 
+    struct Node nodes[20];
+    u32 num_nodes = 0;
+    struct token* _token = lexi->tokens;
+    
+    while(true)
+    {
+        switch (_token->type)
+        {
+            //todo(facts): op have variable args.
+            case tk_op:
+            {
+                struct Node* instr = &parser->nodes[num_nodes];
+                instr->type = NODE_INSTR;
+                instr->instrNode.opcode = *_token; 
+                _token++;
+                num_nodes ++;
+       
+                struct Node* param1 = &parser->nodes[num_nodes];
+                param1->type = NODE_REGISTER;
+                param1->reg = *_token;
+                
+                instr->instrNode.param1 = param1;
+                _token++;
+                num_nodes++;
+
+                struct Node *param2 = &parser->nodes[num_nodes];
+                param2->type = NODE_LITERAL;
+                param2->literal = atoi(_token->lexeme);
+
+                instr->instrNode.param2 = param2;
+                _token++;
+                num_nodes++;
+              
+            }break;
+            case tk_terminate:
+            {
+                goto exit;
+            }break;
+            default:
+            {
+                _token++;
+            }
+        }
+    }
+
+    exit:
+    parser->num_nodes = num_nodes;
+
+    print_nodes(parser);
+
+    printl("bai bai");
 }
 
 struct assembler
@@ -158,24 +294,6 @@ struct assembler
 
 void assemble()
 {
-    u8 code[256] = {
-    movv, r1 , 0x11,
-    movv, r2 , 0x22,
-    addr, r1 , r2,
-    halt
-    };
-     FILE *file;
-    file = fopen("data.bin", "wb");
-    if (file == NULL) {
-        fprintf(stderr, "Failed to open file\n");
-        return;
-    }
-
-    // Write data to the file
-    fwrite(code, sizeof(u8), sizeof(code) / sizeof(u8), file);
-
-    // Close the file
-    fclose(file);
-
+   
     //ass->bin = 
 }
