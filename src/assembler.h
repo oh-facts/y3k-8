@@ -10,6 +10,7 @@ enum token_type
     tk_op,
     tk_reg,
     tk_lit,
+    tk_comma,
     tk_terminate,
     tk_num
 };
@@ -18,7 +19,7 @@ typedef enum token_type token_type;
 
 global char* token_type_str[tk_num] = 
 {
-    "INVALID", "OP","REGISTER", "LITERAL"
+    "INVALID", "OP","REGISTER", "LITERAL", "COMMA", "TERMINATE"
 };
 
 struct token
@@ -48,7 +49,7 @@ void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 {
     char* current = &data[0];
 
-    struct token* tokens = push_array(arena, struct token, 10);
+    struct token* tokens = push_array(arena, struct token, 20);
     u32 num_tokens = 0;
 
     while(true)
@@ -89,6 +90,16 @@ void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 current +=2; 
                 num_tokens++;
             }break;
+            case ',':
+            {
+                tokens[num_tokens].type = tk_comma;
+                tokens[num_tokens].lexeme[0] = ',';
+
+                current ++; 
+                num_tokens++;
+
+            }break;
+
             // fall through
             case '\n':
             case ' ':
@@ -147,22 +158,42 @@ enum NODE_TYPE
 {
     NODE_INVALID,
     NODE_INSTR,
+    NODE_OP,
     NODE_LITERAL,
     NODE_REGISTER,
 };
 
 typedef enum NODE_TYPE NODE_TYPE;
 
+// Note(facts): I am not using this anywhere currently. I will only use this
+// for debug purposes. Its a pain to maintain these. I must phase these out.
+// or generate them programatically. A switch case would be neater but these
+// are elegant to look at. Maybe I will generate them at some point.
 global const char* node_type_str[] = 
 {
-    "invalid", "instruction", "literal", "register"
+    "invalid", "instruction", "opcode" ,"literal", "register"
+};
+
+struct OpNode
+{
+    struct token token;
+};
+
+struct LitNode
+{
+    struct token token;
+};
+
+struct RegNode
+{
+    struct token token;
 };
 
 struct Node;
 
 struct InstrNode
 {
-    struct token opcode;
+    struct Node* opcode;
     struct Node* param1;
     struct Node* param2;
 };
@@ -172,18 +203,22 @@ struct Node
     NODE_TYPE type;
     union
     {
-        struct InstrNode instrNode;
-        u8 literal;
-        struct token reg;
+        struct InstrNode instr_node;
+        struct OpNode op_node;
+        struct LitNode lit_node;
+        struct RegNode reg_node;
     };
 };
 
 struct parser
 {
-    struct Node nodes[20];
-    i32 num_nodes;
+    // for now my asm is just a set of instructions
+    struct Node* instr;
+    i32 num_instr;
 };
 
+// todo(facts): Maybe make an int offset that adds an offset when printing so they look
+// better
 void print_node(struct Node* node)
 {
     switch(node->type)
@@ -194,25 +229,27 @@ void print_node(struct Node* node)
         }break;
         case NODE_INSTR:
         {
-
-            printl("Opcode: %s %s", token_type_str[node->instrNode.opcode.type], 
-            node->instrNode.opcode.lexeme);
+            print_node(node->instr_node.opcode);
 
             printf("Arg1:");
-            print_node(node->instrNode.param1);
+            print_node(node->instr_node.param1);
 
             printf("Arg2:");
-            print_node(node->instrNode.param2);
+            print_node(node->instr_node.param2);
             printf("\n");
 
         }break;
+        case NODE_OP:
+        {
+            printl("Opcode: %s", node->op_node.token.lexeme);
+        }break;
         case NODE_REGISTER:
         {
-            printl("%s", node->reg.lexeme);
+            printl("Register %s", node->reg_node.token.lexeme);
         }break;
         case NODE_LITERAL:
         {
-            printl("%d", node->literal);
+            printl("Literal %s", node->lit_node.token.lexeme);
         }break;
 
         default:
@@ -224,47 +261,74 @@ void print_node(struct Node* node)
 
 void print_nodes(struct parser* parser)
 {
-    for(i32 i = 0; i < parser->num_nodes; i ++)
+    for(i32 i = 0; i < parser->num_instr; i ++)
     {
-        print_node(&parser->nodes[i]);
+        printl("Instruction %d",i);
+        print_node(&parser->instr[i]);
     }
 }
 
-void parse_tokens(struct parser* parser, struct lexer* lexi)
+void parse_param_token(struct Node* param, const struct token* token)
 {
+    if(token->type == tk_lit)
+    {
+        param->type = NODE_LITERAL;
+        param->lit_node.token = *token;
+    }
+    else if(token->type == tk_reg)
+    {
+        param->type = NODE_REGISTER;
+        param->reg_node.token = *token;
+    }
+    else
+    {
+        AssertM(3>4,"control shouldn't come here");
+    }
+}
 
-    struct Node nodes[20];
+void parse_tokens(struct parser* parser, struct lexer* lexi, struct Arena* arena)
+{
     u32 num_nodes = 0;
     struct token* _token = lexi->tokens;
     
+    parser->instr = push_array(arena, struct Node, 20);
+    parser->num_instr = 0;
+
     while(true)
     {
         switch (_token->type)
         {
-            //todo(facts): op have variable args.
+            //todo(facts):
             case tk_op:
             {
-                struct Node* instr = &parser->nodes[num_nodes];
+                struct Node* instr = &parser->instr[parser->num_instr];
                 instr->type = NODE_INSTR;
-                instr->instrNode.opcode = *_token; 
+                // Note(facts): Unsure about this. Should I just make
+                // my opcode node an OpNode or leave it as a generic Node*
+                instr->instr_node.opcode = push_struct(arena,struct Node);
+                instr->instr_node.opcode->op_node.token = *_token; 
+                instr->instr_node.opcode->type = NODE_OP;
                 _token++;
-                num_nodes ++;
-       
-                struct Node* param1 = &parser->nodes[num_nodes];
-                param1->type = NODE_REGISTER;
-                param1->reg = *_token;
-                
-                instr->instrNode.param1 = param1;
-                _token++;
-                num_nodes++;
+                parser->num_instr++;
+            
+                struct Node* param1 = push_struct(arena,struct Node);
+                parse_param_token(param1,_token);
+                instr->instr_node.param1 = param1;
+                _token++;            
 
-                struct Node *param2 = &parser->nodes[num_nodes];
-                param2->type = NODE_LITERAL;
-                param2->literal = atoi(_token->lexeme);
+                if(_token->type == tk_comma)
+                {
+                    // after comma
+                    _token++;       
 
-                instr->instrNode.param2 = param2;
-                _token++;
-                num_nodes++;
+                    // I am not writing a function to save 2 loc
+                    struct Node* param2 = push_struct(arena,struct Node);
+                    parse_param_token(param2,_token);
+                    instr->instr_node.param2 = param2;
+                    _token++;                     
+                }
+                    
+                print_node(instr);
               
             }break;
             case tk_terminate:
@@ -279,7 +343,6 @@ void parse_tokens(struct parser* parser, struct lexer* lexi)
     }
 
     exit:
-    parser->num_nodes = num_nodes;
 
     print_nodes(parser);
 

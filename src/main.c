@@ -69,10 +69,10 @@ int main(int argc, char *argv[])
   
   struct lexer lexi = {0};
   lex_tokens(data, &lexi, &arena);
-  //print_tokens(&lexi);
+  print_tokens(&lexi);
 
   struct parser parser = {0};
-  parse_tokens(&parser, &lexi);
+  parse_tokens(&parser, &lexi, &arena);
   
   //assemble();
   //u8* code = yk_read_binary_file("data.bin",&arena);
