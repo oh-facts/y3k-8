@@ -109,6 +109,16 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 lexi->num_tokens++;
 
             }break;
+            
+            // skip comments until it finds a new line
+            case ';':
+            {
+                while(*(++current) != '\n')
+                {
+                    //printf("%c",*current);
+                    // :)
+                }
+            }break;
 
             // fall through
             case '\n':

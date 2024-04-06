@@ -1,3 +1,6 @@
-movv r1, 69
-movv r2, 420
-addr r1, r2
+movv r1, 69     ; move value 69  to register r1
+movv r2, 420    ; move value 420 to register r2
+addr r1, r2     ; add registers r1 and r2
+
+; this comment will cause problems unless I put a blank line after. Because my comment skipper skips until
+; there if a blank line. Cheeky fix would be forcefully adding a blank line when reading file.
