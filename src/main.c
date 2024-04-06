@@ -1,5 +1,8 @@
+#include "common.h"
+#include "language.h"
 #include "computer.c"
 #include "assembler.c"
+
 #if defined(__unix__) || defined(__APPLE__)
 #define fopen_s(pFile, filepath, mode) ((*(pFile)) = fopen((filepath), (mode))) == NULL
 #endif

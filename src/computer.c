@@ -1,5 +1,3 @@
-#include "common.h"
-#include "language.h"
 struct Computer
 {
     u8 reg[register_num];

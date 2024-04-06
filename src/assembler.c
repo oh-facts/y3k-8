@@ -1,6 +1,5 @@
 
 // lexer, then parser, then assembler
-#include "language.h"
 
 #define CHAR_TO_INT(c) ((c) - '0')
 
