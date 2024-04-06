@@ -1,10 +1,9 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
-
-enum registers
+enum register_type
 {
-    ip = 0x00,
+    invalid_register_type = 0x00,
     r1 = 0x01,
     r2 = 0x02,
     r3 = 0x03,
@@ -13,13 +12,14 @@ enum registers
     r6 = 0x06,
     r7 = 0x07,
     r8 = 0x08,
-    acc = 0x09,
+    acc,
+    ip,
     register_num
 };
 
-global const char* registers_str[register_num] = 
+global const char* register_str[register_num] = 
 {
-    "ip",
+    "INVALID REGISTER",
     "r1",
     "r2",
     "r3",
@@ -28,15 +28,27 @@ global const char* registers_str[register_num] =
     "r6",
     "r7",
     "r8",
-    "acc"
+    "acc",
+    "ip",
 };
 
-enum opcode
+enum opcode_type
 {
-    movv = 0x00,
+    invalid_op = 0x00,
+    movv,
     movr,
     addv,
     addr,
+    opcode_num
+};
+
+global const char* opcode_str[opcode_num] = 
+{
+    "INVALID OP",
+    "movv",
+    "movr",
+    "addv",
+    "addr",
 };
 
 

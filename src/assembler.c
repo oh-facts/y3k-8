@@ -41,11 +41,15 @@ internal inline b32 is_digit(char a)
 internal void print_tokens(struct lexer* lexi)
 {
     printn();
+    printl("Lexer Output");
+    printl("---------------");
+
     for(i32 i = 0; i < lexi->num_tokens; i ++)
     {
         printf("%d %s %s\n", i, token_type_str[lexi->tokens[i].type], lexi->tokens[i].lexeme);
     }
-    ;
+
+    printl("---------------");
     printn();
 }
 
@@ -53,7 +57,8 @@ internal void print_tokens(struct lexer* lexi)
 
 internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 {
-    const u32 max_tokens = 20;
+    //todo(facts): fix me
+    const u32 max_tokens = 1024;
 
     lexi->tokens = push_array(arena, struct token, max_tokens);
 
@@ -171,7 +176,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 
     AssertM(lexi->num_tokens <= max_tokens, "too many tokens");
 
-    //print_tokens(lexi);
+    print_tokens(lexi);
 }
 
 enum NODE_TYPE
@@ -282,11 +287,15 @@ internal void print_node(struct Node* node)
 internal void print_nodes(struct parser* parser)
 {
     printn();
+    printl("Parser Output");
+    printl("---------------");
+   
     for(i32 i = 0; i < parser->num_instr; i ++)
     {
         printl("Instruction %d",i);
         print_node(&parser->instr[i]);
     }
+    printl("---------------");
     printn();
 }
 
@@ -308,12 +317,19 @@ internal void parse_param_token(struct Node* param, const struct token* token)
     }
 }
 
+/*
+    Write now the trees are purely made up of nodes or tokens.
+    I normally represet literals and other symbols with primitives
+    but I think I prefer them as tokens. Maybe I can have another
+    step where I convert them to primitives from tokens? Or maybe that
+    is a job for my assembler?
+*/
 internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Arena* arena)
 {
     u32 num_nodes = 0;
     struct token* _token = lexi->tokens;
     
-    parser->instr = push_array(arena, struct Node, 20);
+    parser->instr = push_array(arena, struct Node, 1024);
     parser->num_instr = 0;
 
     while(true)
@@ -349,8 +365,7 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
                     instr->instr_node.param2 = param2;
                     _token++;                     
                 }
-                    
-                print_node(instr);
+                
               
             }break;
             case tk_terminate:
@@ -368,18 +383,97 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
 
     print_nodes(parser);
 
-    printl("bai bai");
 }
 
-struct assembler
+size_t hash(const u8 *str)
 {
-    i32 temp;
-    u8 bin[100];
-};
+    size_t hash = 5381;
+    i32 c;
 
-void assemble()
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
+}
+
+u8* assemble(struct parser* parser, struct Arena* arena)
 {
-    volatile int i = 0;
-    volatile int a = 0;
-    //ass->bin = 
+    u8* bin = push_array(arena, u8, 100);
+    u32 bindex = 0;
+
+    size_t register_hashes[register_num] = {0};
+    size_t opcode_hashes[opcode_num] = {0};
+
+    for(i32 i = 0; i < register_num; i ++)
+    {
+        register_hashes[i] = hash((u8*)register_str[i]);
+    }
+
+    for(i32 i = 0; i < opcode_num; i ++)
+    {
+        opcode_hashes[i] = hash((u8*)opcode_str[i]);
+    }
+
+
+    for(i32 i = 0; i < parser->num_instr; i ++)
+    {
+        struct InstrNode* instr = &parser->instr[i].instr_node;
+
+        size_t opcode_hash = hash((u8*)instr->opcode->op_node.token.lexeme);
+        if(opcode_hash == opcode_hashes[movv])
+        {
+            bin[bindex++] = movv;
+            size_t reg_hash = hash((u8*)instr->param1->reg_node.token.lexeme);
+            
+            for(i32 i = r1; i <= r8; i ++)
+            {
+                if(reg_hash == register_hashes[i])
+                {
+                    bin[bindex++] = i;
+                    break;
+                }
+            }
+
+            bin[bindex++] = atoi(instr->param2->lit_node.token.lexeme); 
+
+        }
+        else if(opcode_hash == opcode_hashes[movr])
+        {
+            bin[bindex] = movr;
+        }
+        else if(opcode_hash == opcode_hashes[addv])
+        {
+            bin[bindex] = addv;
+        }
+        else if(opcode_hash == opcode_hashes[addr])
+        {
+            bin[bindex++] = addr;
+            size_t reg_hash = hash((u8*)instr->param1->reg_node.token.lexeme);
+            
+            for(i32 i = r1; i <= r8; i ++)
+            {
+                if(reg_hash == register_hashes[i])
+                {
+                    bin[bindex++] = i;
+                    break;
+                }
+            }
+
+            reg_hash = hash((u8*)instr->param2->reg_node.token.lexeme);
+            for(i32 i = r1; i <= r8; i ++)
+            {
+                if(reg_hash == register_hashes[i])
+                {
+                    bin[bindex++] = i;
+                    break;
+                }
+            }
+            
+        }
+
+    }   
+
+
+    return bin;
+
 }

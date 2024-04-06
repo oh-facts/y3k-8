@@ -1,6 +1,9 @@
-# Y3k-8
+# Y3k-8 
+### v0.0.1
 
-Name is placeholder. This is an 8 bit emulator. I am currently working on the assembler. All programs will be made in my own assembly. It will probably borrow ideas from assembly and other emulators I have seen. 
+Name is placeholder. This is an 8 bit emulator. All programs will be made in my own assembly. It will probably borrow ideas from assembly and other emulators I have seen. 
+
+Atm I am working on improving the parser. Once its better, I will add more instructions and sys calls and devices.
 
 I will eventually make a custom C like language for the emulator, then make an OS with it.
 
@@ -20,7 +23,9 @@ clang  ../src/main.c -o bin.exe
 
 `./out "filename"`
 
-Check `src/language.h` and `tests/` to look at the assembly instructions. Atm, only the lexer and parser are complete. So you'll only see tokens and nodes printed to the console.
+Check `src/language.h` and `tests/` to look at the assembly instructions that are currently supported.
+When you run the program, you will see the lexer and parser output. And then you will see the
+values inside the registers.
 
 ## Contributing
 

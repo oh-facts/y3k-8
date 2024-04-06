@@ -77,8 +77,13 @@ internal void execute(struct Computer *self)
 
 internal void print_registers(struct Computer* self)
 {   
-    for(i32 i = 0; i < register_num; i ++)
+    printl("Register View");
+    printl("---------------");
+    for(i32 i = r1; i < register_num; i ++)
     {
-        printl("%s : 0x%02x",registers_str[i], self->reg[i]);
+        printl("%s : 0x%02x",register_str[i], self->reg[i]);
+        //printl("%s : %d",register_str[i], self->reg[i]);
     }
+    printl("---------------");
+
 }

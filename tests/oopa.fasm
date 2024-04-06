@@ -1,7 +1,7 @@
 ; r1, r2 ... r8 are general purpose registers. I don't remember why there are eight
 
-movv r1, 69     ; r1 = 69
-movv r2, 420    ; r2 = 420
+movv r1, 10     ; r1 = 69
+movv r2, 9      ; r2 = 420
 addr r1, r2     ; r1 = r1 + r2;
 
 ; this comment will cause problems unless I put a blank line after. Because my comment skipper skips until

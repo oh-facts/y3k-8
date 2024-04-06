@@ -6,7 +6,9 @@
 ```
 
 ### About
-Lexer converts characters to tokens. Parser puts tokens inside of ASTs. Assembler converts AST trees to binary.
+Lexer converts characters to tokens. Parser puts tokens inside of ASTs. Assembler converts AST trees to binary. atm, the parser node representation is entirely composed of nodes and tokens. I don't know if its
+better to convert literal tokens to literals at this step or do it all in the assembler (what I am currently doing)
+
 Only instructions. No labels. No data section.
 No validation done at any stage.
 very verbose - addv and addr. Eventually the lexer will 

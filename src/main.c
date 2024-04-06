@@ -65,37 +65,27 @@ int main(int argc, char *argv[])
   AssertM(argc == 2, "Usage: ./out \"filename\" ");
   printf("beep boop beep\n");
 
+  printf("%s\n",argv[1]);
  
-  size_t mem_size = Megabytes(16);
+  size_t mem_size = Megabytes(1);
   struct Arena arena;
   arena_innit(&arena, mem_size, calloc(mem_size,sizeof(u8)));
   char* data =  yk_read_text_file(argv[1],&arena);
   
   struct lexer lexi = {0};
   lex_tokens(data, &lexi, &arena);
-  print_tokens(&lexi);
 
   struct parser parser = {0};
   parse_tokens(&parser, &lexi, &arena);
   
-  //assemble();
-  //u8* code = yk_read_binary_file("data.bin",&arena);
-  
-  //struct Computer comp = {0};
+  u8* bin = assemble(&parser, &arena);
 
-  //comp.ram = code;
-   /*
-  u8 code[256] = {
-    movv, r1 , 0x11,
-    movv, r2 , 0x22,
-    addr, r1 , r2,
-    hlt 
-  };
-*/
+  struct Computer comp = {0};
+  comp.ram = bin;
   
-  //execute(&comp);
+  execute(&comp);
 
-  //print_registers(&comp);
+  print_registers(&comp);
 
   printf("exited\n");
   
