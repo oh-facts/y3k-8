@@ -1,6 +1,10 @@
-movv r1, 69     ; move value 69  to register r1
-movv r2, 420    ; move value 420 to register r2
-addr r1, r2     ; add registers r1 and r2
+; r1, r2 ... r8 are general purpose registers. I don't remember why there are eight
+
+movv r1, 69     ; r1 = 69
+movv r2, 420    ; r2 = 420
+addr r1, r2     ; r1 = r1 + r2;
 
 ; this comment will cause problems unless I put a blank line after. Because my comment skipper skips until
-; there if a blank line. Cheeky fix would be forcefully adding a blank line when reading file.
+; there is a blank line. Cheeky fix would be forcefully adding a blank line when reading file. Open to 
+; alternate fixes. ctrl + f ":)" to find the relevant loc. Don't suggest adding more conditions to the
+; while
