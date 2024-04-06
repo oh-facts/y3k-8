@@ -1,6 +1,6 @@
 
 // lexer, then parser, then assembler
-
+// todo(facts): Stick to some coding convention
 #define CHAR_TO_INT(c) ((c) - '0')
 
 enum token_type
@@ -33,8 +33,10 @@ struct lexer
     u32 num_tokens;
 };
 
-#include <math.h>
-#include <ctype.h>
+internal inline b32 is_digit(char a)
+{
+    return (a >= '0' && a <= '9');
+}
 
 internal void print_tokens(struct lexer* lexi)
 {
@@ -43,16 +45,23 @@ internal void print_tokens(struct lexer* lexi)
     {
         printf("%d %s %s\n", i, token_type_str[lexi->tokens[i].type], lexi->tokens[i].lexeme);
     }
+    ;
     printn();
 }
 
+
+
 internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 {
+    const u32 max_tokens = 20;
+
+    lexi->tokens = push_array(arena, struct token, max_tokens);
+
+    // Need a better name for this
+    #define new_token(lexer) (lexer->tokens[lexer->num_tokens])
+
     char* current = &data[0];
-
-    struct token* tokens = push_array(arena, struct token, 20);
-    u32 num_tokens = 0;
-
+    
     while(true)
     {
         
@@ -71,33 +80,33 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 char* peek = current;
                 for(i32 i = 0; i < 4; i ++)
                 {
-                    tokens[num_tokens].lexeme[i] = *peek; 
+                    new_token(lexi).lexeme[i] = *peek; 
                     peek++;
                 }
 
-                tokens[num_tokens].type = tk_op;  
+                new_token(lexi).type = tk_op;  
                 current += 4;                 
                 
-                num_tokens ++;
+                lexi->num_tokens ++;
             }break;
             case 'r':
             {
-                tokens[num_tokens].type = tk_reg;
-                tokens[num_tokens].lexeme[0] = 'r';
+                new_token(lexi).type = tk_reg;
+                new_token(lexi).lexeme[0] = 'r';
 
                 char* peek = current + 1;
-                tokens[num_tokens].lexeme[1] = *peek;
+                new_token(lexi).lexeme[1] = *peek;
 
                 current +=2; 
-                num_tokens++;
+                lexi->num_tokens++;
             }break;
             case ',':
             {
-                tokens[num_tokens].type = tk_comma;
-                tokens[num_tokens].lexeme[0] = ',';
+                new_token(lexi).type = tk_comma;
+                new_token(lexi).lexeme[0] = ',';
 
                 current ++; 
-                num_tokens++;
+                lexi->num_tokens++;
 
             }break;
 
@@ -111,25 +120,25 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 
             default:
             {
-                if(isdigit(*current))
+                if(is_digit(*current))
                 {
                     //ToDo(facts): hexadecimal support. check for 0x
-                    tokens[num_tokens].type = tk_lit;
+                    new_token(lexi).type = tk_lit;
                     
                     char* peek = current;
                     i32 len = 0;
 
                     while(true)
                     {
-                        tokens[num_tokens].lexeme[len] = *peek;
+                        new_token(lexi).lexeme[len] = *peek;
                         len ++;
 
-                        if(!isdigit(*(++peek)))
+                        if(!is_digit(*(++peek)))
                         {
                             break;
                         }
                     }
-                    num_tokens++;
+                    lexi->num_tokens++;
                     
                     
                     //printf("%d\n",num);
@@ -145,12 +154,12 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
             
         }
     }
-    exit:
-    tokens[num_tokens].type = tk_terminate;
-    num_tokens++;
 
-    lexi->tokens = tokens;
-    lexi->num_tokens = num_tokens;
+    exit:
+    new_token(lexi).type = tk_terminate;
+    lexi->num_tokens++;
+
+    AssertM(lexi->num_tokens <= max_tokens, "too many tokens");
 
     //print_tokens(lexi);
 }

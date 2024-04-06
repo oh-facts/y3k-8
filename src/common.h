@@ -4,7 +4,6 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <stdio.h>
-#include <string.h>
 
 #define printl(...) printf(__VA_ARGS__); printf("\n")
 #define printn()	printf("\n")
@@ -67,7 +66,6 @@ struct Arena
 	u8* base;
 	size_t used;
 };
-
 
 internal void* _arena_alloc(struct Arena* arena, size_t size)
 {
