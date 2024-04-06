@@ -1,0 +1,3 @@
+movv r1, 69
+movv r2, 420
+addr r1, r2

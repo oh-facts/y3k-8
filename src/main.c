@@ -1,5 +1,5 @@
-#include <computer.h>
-#include <assembler.h>
+#include "computer.c"
+#include "assembler.c"
 #if defined(__unix__) || defined(__APPLE__)
 #define fopen_s(pFile, filepath, mode) ((*(pFile)) = fopen((filepath), (mode))) == NULL
 #endif
@@ -59,13 +59,14 @@ internal u8 *yk_read_binary_file(const char *filename, struct Arena *arena)
 
 int main(int argc, char *argv[])
 {
+  AssertM(argc == 2, "Usage: ./out \"filename\" ");
   printf("beep boop beep\n");
 
  
   size_t mem_size = Megabytes(16);
   struct Arena arena;
   arena_innit(&arena, mem_size, calloc(mem_size,sizeof(u8)));
-  char* data =  yk_read_text_file("eep.fasm",&arena);
+  char* data =  yk_read_text_file(argv[1],&arena);
   
   struct lexer lexi = {0};
   lex_tokens(data, &lexi, &arena);

@@ -1,6 +1,6 @@
 
 // lexer, then parser, then assembler
-#include <language.h>
+#include "language.h"
 
 #define CHAR_TO_INT(c) ((c) - '0')
 
@@ -37,7 +37,7 @@ struct lexer
 #include <math.h>
 #include <ctype.h>
 
-void print_tokens(struct lexer* lexi)
+internal void print_tokens(struct lexer* lexi)
 {
     printn();
     for(i32 i = 0; i < lexi->num_tokens; i ++)
@@ -47,7 +47,7 @@ void print_tokens(struct lexer* lexi)
     printn();
 }
 
-void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
+internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 {
     char* current = &data[0];
 
@@ -221,7 +221,7 @@ struct parser
 
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look
 // better
-void print_node(struct Node* node)
+internal void print_node(struct Node* node)
 {
     switch(node->type)
     {
@@ -261,7 +261,7 @@ void print_node(struct Node* node)
     }
 }
 
-void print_nodes(struct parser* parser)
+internal void print_nodes(struct parser* parser)
 {
     printn();
     for(i32 i = 0; i < parser->num_instr; i ++)
@@ -272,7 +272,7 @@ void print_nodes(struct parser* parser)
     printn();
 }
 
-void parse_param_token(struct Node* param, const struct token* token)
+internal void parse_param_token(struct Node* param, const struct token* token)
 {
     if(token->type == tk_lit)
     {
@@ -290,7 +290,7 @@ void parse_param_token(struct Node* param, const struct token* token)
     }
 }
 
-void parse_tokens(struct parser* parser, struct lexer* lexi, struct Arena* arena)
+internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Arena* arena)
 {
     u32 num_nodes = 0;
     struct token* _token = lexi->tokens;
@@ -361,5 +361,7 @@ struct assembler
 
 void assemble()
 {
+    volatile int i = 0;
+    volatile int a = 0;
     //ass->bin = 
 }
