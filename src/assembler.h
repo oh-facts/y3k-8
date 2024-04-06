@@ -39,10 +39,12 @@ struct lexer
 
 void print_tokens(struct lexer* lexi)
 {
+    printn();
     for(i32 i = 0; i < lexi->num_tokens; i ++)
     {
         printf("%d %s %s\n", i, token_type_str[lexi->tokens[i].type], lexi->tokens[i].lexeme);
     }
+    printn();
 }
 
 void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
@@ -236,7 +238,7 @@ void print_node(struct Node* node)
 
             printf("Arg2:");
             print_node(node->instr_node.param2);
-            printf("\n");
+            printn();
 
         }break;
         case NODE_OP:
@@ -261,11 +263,13 @@ void print_node(struct Node* node)
 
 void print_nodes(struct parser* parser)
 {
+    printn();
     for(i32 i = 0; i < parser->num_instr; i ++)
     {
         printl("Instruction %d",i);
         print_node(&parser->instr[i]);
     }
+    printn();
 }
 
 void parse_param_token(struct Node* param, const struct token* token)
@@ -357,6 +361,5 @@ struct assembler
 
 void assemble()
 {
-   
     //ass->bin = 
 }

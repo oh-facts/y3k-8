@@ -7,6 +7,7 @@
 #include <string.h>
 
 #define printl(...) printf(__VA_ARGS__); printf("\n")
+#define printn()	printf("\n")
 
 #define DEBUG 1
 
