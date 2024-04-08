@@ -23,7 +23,7 @@ b32 match_word(char* start, const char* match, u32 size)
 #define enum_gen "gen_string_from_enum"
 u32 enum_gen_size = strlen(enum_gen);
 
-b32 extract(char* start)
+void extract(char* start)
 {
     // verify
     char* peek = start + enum_gen_size;
@@ -57,10 +57,8 @@ b32 extract(char* start)
                 len = 0;
             }
         }
-        return true;
     }
     
-    return false;
 }
 
 int main(int argc, char* argv[])
@@ -80,10 +78,7 @@ int main(int argc, char* argv[])
         {
             if(match_word(peek, enum_gen, enum_gen_size ))
             {
-                if(extract(peek))
-                {
-                    break;
-                }
+                extract(peek);
                 //printf("%s",peek);
                 //break;
             }

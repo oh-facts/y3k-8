@@ -4,12 +4,11 @@
 // idea: Why don't I just store exact opcode or register as a token? (doing)
 // todo(facts): Stick to some coding convention (not doing)
 // make token nodes more useful. store tokens anyways, but also store other useful info
-// Make an enum to string generator
+// Make an enum to string generator (doing)
 
 #include "meta.h"
 
 #define CHAR_TO_INT(c) ((c) - '0')
-
 
 gen_string_from_enum
 enum token_type

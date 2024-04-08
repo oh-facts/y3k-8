@@ -1,3 +1,6 @@
+
+// function to write to file
+
 #if defined(__unix__) || defined(__APPLE__)
 #define fopen_s(pFile, filepath, mode) ((*(pFile)) = fopen((filepath), (mode))) == NULL
 #endif
@@ -53,4 +56,19 @@ internal u8 *yk_read_binary_file(const char *filename, struct Arena *arena)
     fclose(file);
     
     return buffer;
+}
+
+internal b32 yk_write_to_file(const char* filename, u8* data)
+{
+    File* file;
+    fopen_s(&file, filename, "w");
+    
+    if(!file)
+    {
+        // create file
+    }
+    
+    // write data to file
+    
+    return true;
 }
