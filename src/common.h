@@ -29,6 +29,8 @@ volatile int *ptr = 0;                   \
 #define AssertM(expr, format, ...)
 #endif
 
+#define INVALID_CODE_PATH() AssertM(1 > 2, "Invalid code path. Control should never reach here. Yet it did. Are you stupid? (Y or N)")
+
 #define Kilobytes(Value) ((uint64_t)(Value) * 1024)
 #define Megabytes(Value) (Kilobytes(Value) * 1024)
 #define Gigabytes(Value) (Megabytes(Value) * 1024)

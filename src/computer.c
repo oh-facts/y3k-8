@@ -38,6 +38,8 @@ i8 use_device(struct Device* device, i8 in)
             printl("Control shouldn't be here");
         }
     }
+    
+    return -1;
 }
 
 struct Computer

@@ -1,8 +1,10 @@
 // lexer, then parser, then assembler
-// todo(facts): Stick to some coding convention
 
-// Store hashed lexemes alongside lexemes?
-// idea: Why don't I just store exact opcode or register as a token?
+// Store hashed lexemes alongside lexemes? (no)
+// idea: Why don't I just store exact opcode or register as a token? (doing)
+// todo(facts): Stick to some coding convention (not doing)
+// make token nodes more useful. store tokens anyways, but also store other useful info
+// Make an enum to string generator
 
 #define CHAR_TO_INT(c) ((c) - '0')
 
@@ -11,7 +13,6 @@
 enum token_type
 {
     tk_invalid,
-    tk_op,
     
     tk_r1,
     tk_r2,
@@ -36,10 +37,11 @@ enum token_type
 typedef enum token_type token_type;
 
 #define token_type_op_offset (tk_movv - 1)
+#define token_type_reg_offset (tk_r1 - 1)
 
 global char* token_type_str[tk_num] = 
 {
-    "INVALID", "OP","REGISTER", "LITERAL", "COMMA", "TERMINATE"
+    "INVALID", "r1", "r2", "r3", "r4", "r5", "r6", "r7""REGISTER", "LITERAL", "COMMA", "TERMINATE"
 };
 
 struct token
@@ -59,6 +61,11 @@ internal inline b32 is_digit(char a)
     return (a >= '0' && a <= '9');
 }
 
+internal inline b32 is_alpha(char a)
+{
+    return ((a >= 'A' && a <= 'Z') || (a >= 'a' && a <= 'z'));
+}
+
 internal void print_tokens(struct lexer* lexi)
 {
     printn();
@@ -74,7 +81,7 @@ internal void print_tokens(struct lexer* lexi)
     printn();
 }
 
-
+#include <string.h>
 
 internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 {
@@ -85,7 +92,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     char* end = data;
     
     // Need a better name for this
-#define new_token lexer->tokens[lexer->num_tokens]
+#define new_token lexi->tokens[lexi->num_tokens] 
     
     char* current = &data[0];
     
@@ -154,7 +161,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     char* peek = current;
                     u32 lexeme_len = 0;
                     
-                    while(*peek != ' ' || *peek != '\n' || *peek != '\0')
+                    while(is_alpha(*peek) || is_digit(*peek))
                     {
                         new_token.lexeme[lexeme_len] = *peek; 
                         
@@ -167,12 +174,10 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     {
                         case 'r':
                         {
-                            
-#define make_reg(c, num) c##num 
                             if(is_digit(new_token.lexeme[1]))
                             {
-                                new_token.type = make_reg(r,CHAR_TO_INT(new_token.lexeme[1]));
-                                
+                                i32 reg_num = CHAR_TO_INT(new_token.lexeme[1]);
+                                new_token.type = reg_num + token_type_reg_offset;
                             }
                             else
                             {
@@ -183,7 +188,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                         
                     }
                     
-                    for(i32 i = movv, i <opcode_num; i ++)
+                    for(i32 i = movv; i <opcode_num; i ++)
                     {
                         if(strcmp(new_token.lexeme,opcode_str[i]) == 0)
                         {
@@ -208,7 +213,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     }
     
     exit:
-    new_token(lexi).type = tk_terminate;
+    new_token.type = tk_terminate;
     lexi->num_tokens++;
     
     AssertM(lexi->num_tokens <= max_tokens, "too many tokens");
@@ -219,7 +224,8 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 enum NODE_TYPE
 {
     NODE_INVALID,
-    NODE_INSTR,
+    NODE_INSTR_RR,
+    NODE_INSTR_RV,
     NODE_OP,
     NODE_LITERAL,
     NODE_REGISTER,
@@ -233,7 +239,7 @@ typedef enum NODE_TYPE NODE_TYPE;
 // are elegant to look at. Maybe I will generate them at some point.
 global const char* node_type_str[] = 
 {
-    "invalid", "instruction", "opcode" ,"literal", "register"
+    "invalid", "instruction_RR","instruction_RV" , "opcode" ,"literal", "register"
 };
 
 struct OpNode
@@ -253,12 +259,12 @@ struct RegNode
 
 struct Node;
 
-struct InstrNode
+typedef struct InstrNode
 {
     struct Node* opcode;
     struct Node* param1;
     struct Node* param2;
-};
+}InstrNodeRR, InstrNodeRV;
 
 struct Node
 {
@@ -289,7 +295,8 @@ internal void print_node(struct Node* node)
         {
             printl("invalid node");
         }break;
-        case NODE_INSTR:
+        case NODE_INSTR_RR:
+        case NODE_INSTR_RV:
         {
             print_node(node->instr_node.opcode);
             
@@ -343,7 +350,7 @@ internal void parse_param_token(struct Node* param, const struct token* token)
         param->type = NODE_LITERAL;
         param->lit_node.token = *token;
     }
-    else if(token->type == tk_reg)
+    else if(token->type >= tk_r1 && token->type <=tk_r8)
     {
         param->type = NODE_REGISTER;
         param->reg_node.token = *token;
@@ -374,10 +381,11 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
         switch (_token->type)
         {
             //todo(facts):
-            case tk_op:
+            case tk_addv:
+            case tk_movv:
             {
                 struct Node* instr = &parser->instr[parser->num_instr];
-                instr->type = NODE_INSTR;
+                instr->type = NODE_INSTR_RV;
                 // Note(facts): Unsure about this. Should I just make
                 // my opcode node an OpNode or leave it as a generic Node*
                 instr->instr_node.opcode = push_struct(arena,struct Node);
@@ -391,19 +399,45 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
                 instr->instr_node.param1 = param1;
                 _token++;            
                 
-                if(_token->type == tk_comma)
+                if(_token->type != tk_comma)
                 {
-                    // after comma
-                    _token++;       
-                    
-                    // I am not writing a function to save 2 loc
-                    struct Node* param2 = push_struct(arena,struct Node);
-                    parse_param_token(param2,_token);
-                    instr->instr_node.param2 = param2;
-                    _token++;                     
+                    printf("%s expects two arguments. One received", _token->lexeme);
                 }
+                _token++;
                 
+                struct Node* param2 = push_struct(arena,struct Node);
+                parse_param_token(param2,_token);
+                instr->instr_node.param2 = param2;
+                _token++;                     
+            }break;
+            case tk_addr:
+            case tk_movr:
+            {
+                struct Node* instr = &parser->instr[parser->num_instr];
+                instr->type = NODE_INSTR_RR;
+                // Note(facts): Unsure about this. Should I just make
+                // my opcode node an OpNode or leave it as a generic Node*
+                instr->instr_node.opcode = push_struct(arena,struct Node);
+                instr->instr_node.opcode->op_node.token = *_token; 
+                instr->instr_node.opcode->type = NODE_OP;
+                _token++;
+                parser->num_instr++;
                 
+                struct Node* param1 = push_struct(arena,struct Node);
+                parse_param_token(param1,_token);
+                instr->instr_node.param1 = param1;
+                _token++;            
+                
+                if(_token->type != tk_comma)
+                {
+                    printf("%s expects two arguments. One received", _token->lexeme);
+                }
+                _token++;
+                
+                struct Node* param2 = push_struct(arena,struct Node);
+                parse_param_token(param2,_token);
+                instr->instr_node.param2 = param2;
+                _token++;   
             }break;
             case tk_terminate:
             {
@@ -431,61 +465,35 @@ u8* assemble(struct parser* parser, struct Arena* arena)
     
     for(i32 i = 0; i < parser->num_instr; i ++)
     {
-        struct InstrNode* instr = &parser->instr[i].instr_node;
-        bin[bindex++] = instr->op_code->op_node.token.type - token_type_to_op_offset;
-        if(instr->param1->type == tt_r)
-            bin[bindex++] = 
-            if(is_op(instr->opcode->op_node.token.hashed_lexeme))
+        struct Node* instr = &parser->instr[i];
+        struct InstrNode* instr_node = &instr->instr_node;
+        
+        switch(instr->type)
         {
-            bin[bindex++] = movv;
-            size_t reg_hash = instr->param1->reg_node.token.hashed_lexeme;
-            
-            // idea: Why don't I just store exact opcode or register as a token?
-            for(i32 i = r1; i <= r8; i ++)
+            case NODE_INSTR_RV:
             {
-                if(reg_hash == register_hashes[i])
-                {
-                    bin[bindex++] = i;
-                    break;
-                }
-            }
+                bin[bindex++] = instr_node->opcode->op_node.token.type - token_type_op_offset;
+                bin[bindex++] = instr_node->param1->reg_node.token.type - token_type_reg_offset;
+                
+                // store literal values inside of the node
+                bin[bindex++] = atoi(instr_node->param2->lit_node.token.lexeme);
+                
+            }break;
             
-            bin[bindex++] = atoi(instr->param2->lit_node.token.lexeme); 
-            
-        }
-        else if(opcode_hash == opcode_hashes[movr])
-        {
-            bin[bindex] = movr;
-        }
-        else if(opcode_hash == opcode_hashes[addv])
-        {
-            bin[bindex] = addv;
-        }
-        else if(opcode_hash == opcode_hashes[addr])
-        {
-            bin[bindex++] = addr;
-            size_t reg_hash = hash((u8*)instr->param1->reg_node.token.lexeme);
-            
-            for(i32 i = r1; i <= r8; i ++)
+            case NODE_INSTR_RR:
             {
-                if(reg_hash == register_hashes[i])
-                {
-                    bin[bindex++] = i;
-                    break;
-                }
-            }
-            
-            reg_hash = hash((u8*)instr->param2->reg_node.token.lexeme);
-            for(i32 i = r1; i <= r8; i ++)
+                bin[bindex++] = instr_node->opcode->op_node.token.type - token_type_op_offset;
+                bin[bindex++] = instr_node->param1->reg_node.token.type - token_type_reg_offset;
+                
+                bin[bindex++] = instr_node->param2->reg_node.token.type - token_type_reg_offset;
+                
+            }break;
+            default:
             {
-                if(reg_hash == register_hashes[i])
-                {
-                    bin[bindex++] = i;
-                    break;
-                }
+                INVALID_CODE_PATH();
             }
-            
         }
+        
         
     }   
     
