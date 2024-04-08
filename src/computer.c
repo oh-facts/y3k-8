@@ -1,7 +1,50 @@
+enum device_type
+{
+    dt_invalid,
+    dt_logger,
+    dt_num
+};
+
+typedef enum device_type device_type;
+
+enum device_state
+{
+    ds_off,
+    ds_on
+};
+
+typedef enum device_state device_state;
+
+struct Device
+{
+    device_type type;
+    device_state state;
+};
+
+i8 use_device(struct Device* device, i8 in)
+{
+    switch (device->type)
+    {
+        case dt_invalid:
+        {
+            printl("device type not initialized. This is a bug");
+        }break;
+        case dt_logger:
+        {
+            printf("%c",in);
+        }break;
+        default:
+        {
+            printl("Control shouldn't be here");
+        }
+    }
+}
+
 struct Computer
 {
     u8 reg[register_num];
     u8 *ram;
+    struct Device devices[dt_num];
 };
 
 internal inline u8 fetch(struct Computer *self)
@@ -30,7 +73,7 @@ internal void execute(struct Computer *self)
                 self->reg[dst] = src;
                 
                 
-
+                
             }break;
             
             case movr:
@@ -43,9 +86,9 @@ internal void execute(struct Computer *self)
                 self->reg[dst] = self->reg[src];
                 
                 
-
+                
             }break;
-
+            
             case addv:
             {
                 next(self);
@@ -56,7 +99,7 @@ internal void execute(struct Computer *self)
                 self->reg[dst] += src;
                 
             }break;
-
+            
             case addr:
             {
                 next(self);
@@ -67,10 +110,10 @@ internal void execute(struct Computer *self)
                 self->reg[dst] += self->reg[src];
                 
             }break;
-
+            
             default:
-                return;
-            }
+            return;
+        }
     }
     
 }
@@ -85,5 +128,5 @@ internal void print_registers(struct Computer* self)
         //printl("%s : %d",register_str[i], self->reg[i]);
     }
     printl("---------------");
-
+    
 }
