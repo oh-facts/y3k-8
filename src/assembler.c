@@ -6,10 +6,12 @@
 // make token nodes more useful. store tokens anyways, but also store other useful info
 // Make an enum to string generator
 
+#include "meta.h"
+
 #define CHAR_TO_INT(c) ((c) - '0')
 
-#define compile_time
 
+gen_string_from_enum
 enum token_type
 {
     tk_invalid,
