@@ -1,32 +1,13 @@
+
 // lexer, then parser, then assembler
 // todo(facts): Stick to some coding convention
-
-// Store hashed lexemes alongside lexemes?
-// idea: Why don't I just store exact opcode or register as a token?
-
 #define CHAR_TO_INT(c) ((c) - '0')
-
-#define compile_time
 
 enum token_type
 {
     tk_invalid,
     tk_op,
-    
-    tk_r1,
-    tk_r2,
-    tk_r3,
-    tk_r4,
-    tk_r5,
-    tk_r6,
-    tk_r7,
-    tk_r8,
-    
-    tk_movv,
-    tk_movr,
-    tk_addv,
-    tk_addr,
-    
+    tk_reg,
     tk_lit,
     tk_comma,
     tk_terminate,
@@ -34,8 +15,6 @@ enum token_type
 };
 
 typedef enum token_type token_type;
-
-#define token_type_op_offset (tk_movv - 1)
 
 global char* token_type_str[tk_num] = 
 {
@@ -64,12 +43,12 @@ internal void print_tokens(struct lexer* lexi)
     printn();
     printl("Lexer Output");
     printl("---------------");
-    
+
     for(i32 i = 0; i < lexi->num_tokens; i ++)
     {
         printf("%d %s %s\n", i, token_type_str[lexi->tokens[i].type], lexi->tokens[i].lexeme);
     }
-    
+
     printl("---------------");
     printn();
 }
@@ -80,13 +59,12 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 {
     //todo(facts): fix me
     const u32 max_tokens = 1024;
-    
+
     lexi->tokens = push_array(arena, struct token, max_tokens);
-    char* end = data;
-    
+
     // Need a better name for this
-#define new_token lexer->tokens[lexer->num_tokens]
-    
+    #define new_token(lexer) (lexer->tokens[lexer->num_tokens])
+
     char* current = &data[0];
     
     while(true)
@@ -94,14 +72,47 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
         
         switch(*current)
         {
+            // add<x>, mov<x>
+            // i want to get the assembler up and running, so I won't be doing
+            // much validation. If your opcode starts with the same letter as 
+            // something that already exists, its valid. If its bigger or smaller
+            // than 4 letters, severe problems can happen. That is for future me
+            // to care about.
+            case 'a':
+            case 'm':
+            {
+                // >:) I know that my opcodes are 4 characters at best
+                char* peek = current;
+                for(i32 i = 0; i < 4; i ++)
+                {
+                    new_token(lexi).lexeme[i] = *peek; 
+                    peek++;
+                }
+
+                new_token(lexi).type = tk_op;  
+                current += 4;                 
+                
+                lexi->num_tokens ++;
+            }break;
+            case 'r':
+            {
+                new_token(lexi).type = tk_reg;
+                new_token(lexi).lexeme[0] = 'r';
+
+                char* peek = current + 1;
+                new_token(lexi).lexeme[1] = *peek;
+
+                current +=2; 
+                lexi->num_tokens++;
+            }break;
             case ',':
             {
-                new_token.type = tk_comma;
-                new_token.lexeme[0] = ',';
-                
+                new_token(lexi).type = tk_comma;
+                new_token(lexi).lexeme[0] = ',';
+
                 current ++; 
                 lexi->num_tokens++;
-                
+
             }break;
             
             // skip comments until it finds a new line
@@ -113,30 +124,30 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     // :)
                 }
             }break;
-            
+
             // fall through
             case '\n':
             case ' ':
             {
-                
+
                 current++;
             }break;
-            
+
             default:
             {
                 if(is_digit(*current))
                 {
                     //ToDo(facts): hexadecimal support. check for 0x
-                    new_token.type = tk_lit;
+                    new_token(lexi).type = tk_lit;
                     
                     char* peek = current;
                     i32 len = 0;
-                    
+
                     while(true)
                     {
-                        new_token.lexeme[len] = *peek;
+                        new_token(lexi).lexeme[len] = *peek;
                         len ++;
-                        
+
                         if(!is_digit(*(++peek)))
                         {
                             break;
@@ -148,71 +159,23 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     //printf("%d\n",num);
                     current += len;
                 }
-                
-                else if(is_alpha(*current))
-                {
-                    char* peek = current;
-                    u32 lexeme_len = 0;
-                    
-                    while(*peek != ' ' || *peek != '\n' || *peek != '\0')
-                    {
-                        new_token.lexeme[lexeme_len] = *peek; 
-                        
-                        lexeme_len++;
-                        peek++;
-                    }
-                    
-                    // anything starting with r is reserved for registers
-                    switch(new_token.lexeme[0])
-                    {
-                        case 'r':
-                        {
-                            
-#define make_reg(c, num) c##num 
-                            if(is_digit(new_token.lexeme[1]))
-                            {
-                                new_token.type = make_reg(r,CHAR_TO_INT(new_token.lexeme[1]));
-                                
-                            }
-                            else
-                            {
-                                AssertM(3>12, "Invalid code path");
-                            }
-                            
-                        }break;
-                        
-                    }
-                    
-                    for(i32 i = movv, i <opcode_num; i ++)
-                    {
-                        if(strcmp(new_token.lexeme,opcode_str[i]) == 0)
-                        {
-                            new_token.type = token_type_op_offset + i;
-                            break;
-                        }
-                    }
-                    
-                    lexi->num_tokens ++;
-                    current += lexeme_len;
-                    
-                }
                 else
                 {
                     goto exit;
                 }
-                
+
             }break;
             
             
         }
     }
-    
+
     exit:
     new_token(lexi).type = tk_terminate;
     lexi->num_tokens++;
-    
+
     AssertM(lexi->num_tokens <= max_tokens, "too many tokens");
-    
+
     print_tokens(lexi);
 }
 
@@ -292,14 +255,14 @@ internal void print_node(struct Node* node)
         case NODE_INSTR:
         {
             print_node(node->instr_node.opcode);
-            
+
             printf("Arg1:");
             print_node(node->instr_node.param1);
-            
+
             printf("Arg2:");
             print_node(node->instr_node.param2);
             printn();
-            
+
         }break;
         case NODE_OP:
         {
@@ -313,7 +276,7 @@ internal void print_node(struct Node* node)
         {
             printl("Literal %s", node->lit_node.token.lexeme);
         }break;
-        
+
         default:
         {
             printl("ooga booga why is control here");
@@ -326,7 +289,7 @@ internal void print_nodes(struct parser* parser)
     printn();
     printl("Parser Output");
     printl("---------------");
-    
+   
     for(i32 i = 0; i < parser->num_instr; i ++)
     {
         printl("Instruction %d",i);
@@ -368,7 +331,7 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
     
     parser->instr = push_array(arena, struct Node, 1024);
     parser->num_instr = 0;
-    
+
     while(true)
     {
         switch (_token->type)
@@ -385,17 +348,17 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
                 instr->instr_node.opcode->type = NODE_OP;
                 _token++;
                 parser->num_instr++;
-                
+            
                 struct Node* param1 = push_struct(arena,struct Node);
                 parse_param_token(param1,_token);
                 instr->instr_node.param1 = param1;
                 _token++;            
-                
+
                 if(_token->type == tk_comma)
                 {
                     // after comma
                     _token++;       
-                    
+
                     // I am not writing a function to save 2 loc
                     struct Node* param2 = push_struct(arena,struct Node);
                     parse_param_token(param2,_token);
@@ -403,7 +366,7 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
                     _token++;                     
                 }
                 
-                
+              
             }break;
             case tk_terminate:
             {
@@ -415,32 +378,53 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
             }
         }
     }
-    
+
     exit:
-    
+
     print_nodes(parser);
-    
+
+}
+
+size_t hash(const u8 *str)
+{
+    size_t hash = 5381;
+    i32 c;
+
+    while ((c = *str++))
+        hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+
+    return hash;
 }
 
 u8* assemble(struct parser* parser, struct Arena* arena)
 {
     u8* bin = push_array(arena, u8, 100);
     u32 bindex = 0;
-    
-    
-    
+
+    size_t register_hashes[register_num] = {0};
+    size_t opcode_hashes[opcode_num] = {0};
+
+    for(i32 i = 0; i < register_num; i ++)
+    {
+        register_hashes[i] = hash((u8*)register_str[i]);
+    }
+
+    for(i32 i = 0; i < opcode_num; i ++)
+    {
+        opcode_hashes[i] = hash((u8*)opcode_str[i]);
+    }
+
+
     for(i32 i = 0; i < parser->num_instr; i ++)
     {
         struct InstrNode* instr = &parser->instr[i].instr_node;
-        bin[bindex++] = instr->op_code->op_node.token.type - token_type_to_op_offset;
-        if(instr->param1->type == tt_r)
-            bin[bindex++] = 
-            if(is_op(instr->opcode->op_node.token.hashed_lexeme))
+
+        size_t opcode_hash = hash((u8*)instr->opcode->op_node.token.lexeme);
+        if(opcode_hash == opcode_hashes[movv])
         {
             bin[bindex++] = movv;
-            size_t reg_hash = instr->param1->reg_node.token.hashed_lexeme;
+            size_t reg_hash = hash((u8*)instr->param1->reg_node.token.lexeme);
             
-            // idea: Why don't I just store exact opcode or register as a token?
             for(i32 i = r1; i <= r8; i ++)
             {
                 if(reg_hash == register_hashes[i])
@@ -449,9 +433,9 @@ u8* assemble(struct parser* parser, struct Arena* arena)
                     break;
                 }
             }
-            
+
             bin[bindex++] = atoi(instr->param2->lit_node.token.lexeme); 
-            
+
         }
         else if(opcode_hash == opcode_hashes[movr])
         {
@@ -474,7 +458,7 @@ u8* assemble(struct parser* parser, struct Arena* arena)
                     break;
                 }
             }
-            
+
             reg_hash = hash((u8*)instr->param2->reg_node.token.lexeme);
             for(i32 i = r1; i <= r8; i ++)
             {
@@ -486,10 +470,10 @@ u8* assemble(struct parser* parser, struct Arena* arena)
             }
             
         }
-        
+
     }   
-    
-    
+
+
     return bin;
-    
+
 }
