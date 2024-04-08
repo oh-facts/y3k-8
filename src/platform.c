@@ -60,12 +60,13 @@ internal u8 *yk_read_binary_file(const char *filename, struct Arena *arena)
 
 internal b32 yk_write_to_file(const char* filename, u8* data)
 {
-    File* file;
+    FILE* file;
     fopen_s(&file, filename, "w");
     
+    // create file if it doesn't exist
     if(!file)
     {
-        // create file
+        
     }
     
     // write data to file

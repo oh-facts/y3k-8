@@ -1,5 +1,8 @@
 // lexer, then parser, then assembler
 
+// IdEAA PHATTEE: When parsing tokens, if something is a string, I can just check the next token and based on that go back and change the previous one.
+// For labels, that works wonderfully. For instructions and parameters, I will have to think how I want it to work. (working on this)
+
 // Store hashed lexemes alongside lexemes? (no)
 // idea: Why don't I just store exact opcode or register as a token? (doing)
 // todo(facts): Stick to some coding convention (not doing)
@@ -29,8 +32,11 @@ enum token_type
     tk_addv,
     tk_addr,
     
+    tk_label,
+    
     tk_lit,
     tk_comma,
+    tk_colon,
     tk_terminate,
     tk_num
 };
@@ -111,6 +117,11 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 lexi->num_tokens++;
                 
             }break;
+            case ':':
+            {
+                new_token.type = tk_colon;
+                new_token.lexeme[0] = ':';
+            }break;
             
             // skip comments until it finds a new line
             case ';':
@@ -121,7 +132,6 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     // :)
                 }
             }break;
-            
             // fall through
             case '\n':
             case ' ':
@@ -129,7 +139,10 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 
                 current++;
             }break;
-            
+            case '\0':
+            {
+                goto exit;
+            }break;
             default:
             {
                 if(is_digit(*current))
@@ -182,7 +195,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                             }
                             else
                             {
-                                AssertM(3>12, "Invalid code path");
+                                INVALID_CODE_PATH();
                             }
                             
                         }break;
@@ -204,7 +217,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 }
                 else
                 {
-                    goto exit;
+                    INVALID_CODE_PATH();
                 }
                 
             }break;
@@ -324,7 +337,7 @@ internal void print_node(struct Node* node)
         
         default:
         {
-            printl("ooga booga why is control here");
+            INVALID_CODE_PATH();
         }
     }
 }
@@ -358,7 +371,7 @@ internal void parse_param_token(struct Node* param, const struct token* token)
     }
     else
     {
-        AssertM(3>4,"control shouldn't come here");
+        INVALID_CODE_PATH();
     }
 }
 
@@ -371,7 +384,6 @@ internal void parse_param_token(struct Node* param, const struct token* token)
 */
 internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Arena* arena)
 {
-    u32 num_nodes = 0;
     struct token* _token = lexi->tokens;
     
     parser->instr = push_array(arena, struct Node, 1024);
