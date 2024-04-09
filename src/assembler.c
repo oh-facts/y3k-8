@@ -261,17 +261,17 @@ global const char* node_type_str[] =
 
 struct OpNode
 {
-    struct token token;
+    opcode_type type;
 };
 
 struct LitNode
 {
-    struct token token;
+    u8 num;
 };
 
 struct RegNode
 {
-    struct token token;
+    register_type type;
 };
 
 struct Node;
@@ -285,6 +285,7 @@ typedef struct InstrNode
 
 struct Node
 {
+    struct token token;
     NODE_TYPE type;
     union
     {
