@@ -133,6 +133,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 }
             }break;
             // fall through
+            case '\t':
             case '\n':
             case ' ':
             {
