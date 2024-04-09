@@ -17,8 +17,6 @@ enum register_type
     register_num
 };
 
-typedef enum register_type register_type;
-
 global const char* register_str[register_num] = 
 {
     "INVALID REGISTER",
@@ -43,8 +41,6 @@ enum opcode_type
     addr,
     opcode_num
 };
-
-typedef enum  opcode_type opcod_type;
 
 global const char* opcode_str[opcode_num] = 
 {

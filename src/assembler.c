@@ -32,9 +32,9 @@ enum token_type
     tk_addv,
     tk_addr,
     
-    tk_lit,
-    tk_ident,
+    tk_label,
     
+    tk_lit,
     tk_comma,
     tk_colon,
     tk_terminate,
@@ -186,32 +186,33 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                         peek++;
                     }
                     
-                    // anything with rx where x is a number is reserved for registers
-                    
-                    // is register?
-                    if(new_token.lexeme[0] == 'r' && lexeme_len == 2 && is_digit(new_token.lexeme[1]))
+                    // anything starting with r is reserved for registers
+                    switch(new_token.lexeme[0])
                     {
-                        i32 reg_num = CHAR_TO_INT(new_token.lexeme[1]);
-                        new_token.type = reg_num + token_type_reg_offset;
-                        lexi->num_tokens ++;
-                        current += lexeme_len;
-                        break;
+                        case 'r':
+                        {
+                            if(is_digit(new_token.lexeme[1]))
+                            {
+                                i32 reg_num = CHAR_TO_INT(new_token.lexeme[1]);
+                                new_token.type = reg_num + token_type_reg_offset;
+                            }
+                            else
+                            {
+                                INVALID_CODE_PATH();
+                            }
+                            
+                        }break;
+                        
                     }
-                    // is opcode?
                     
                     for(i32 i = movv; i <opcode_num; i ++)
                     {
                         if(strcmp(new_token.lexeme,opcode_str[i]) == 0)
                         {
                             new_token.type = token_type_op_offset + i;
-                            lexi->num_tokens ++;
-                            current += lexeme_len;
                             break;
                         }
                     }
-                    
-                    // is identifier!
-                    new_token.type = tk_ident;
                     
                     lexi->num_tokens ++;
                     current += lexeme_len;
@@ -245,7 +246,6 @@ enum NODE_TYPE
     NODE_OP,
     NODE_LITERAL,
     NODE_REGISTER,
-    NODE_LABEL_DECL,
 };
 
 typedef enum NODE_TYPE NODE_TYPE;
@@ -261,32 +261,20 @@ global const char* node_type_str[] =
 
 struct OpNode
 {
-    opcode_type type;
+    struct token token;
 };
 
 struct LitNode
 {
-    u8 num;
+    struct token token;
 };
 
 struct RegNode
 {
-    register_type type;
-};
-
-struct LabelDecl
-{
-    struct Node** instr_nodes;
-};
-
-struct Label
-{
-    struct LabelDecl* ref;
+    struct token token;
 };
 
 struct Node;
-
-typedef struct Instr
 
 typedef struct InstrNode
 {
@@ -298,22 +286,19 @@ typedef struct InstrNode
 struct Node
 {
     NODE_TYPE type;
-    struct token token;
-    
     union
     {
         struct InstrNode instr_node;
         struct OpNode op_node;
         struct LitNode lit_node;
         struct RegNode reg_node;
-        struct LabelDecl label_decl_node;
-        struct Label label;
     };
 };
 
 struct parser
 {
-    struct Node* labels;
+    // for now my asm is just a set of instructions
+    struct Node* instr;
     i32 num_instr;
 };
 
