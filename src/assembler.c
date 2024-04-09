@@ -2,6 +2,7 @@
 
 // IdEAA PHATTEE: When parsing tokens, if something is a string, I can just check the next token and based on that go back and change the previous one.
 // For labels, that works wonderfully. For instructions and parameters, I will have to think how I want it to work. (working on this)
+// make an identifier token? Also, make a Label decl node and a label call node
 
 // Store hashed lexemes alongside lexemes? (no)
 // idea: Why don't I just store exact opcode or register as a token? (doing)
@@ -18,19 +19,16 @@ enum token_type
 {
     tk_invalid,
     
-    tk_r1,
-    tk_r2,
-    tk_r3,
-    tk_r4,
-    tk_r5,
-    tk_r6,
-    tk_r7,
-    tk_r8,
-    
     tk_movv,
     tk_movr,
     tk_addv,
     tk_addr,
+    tk_jmp,
+    
+    tk_r1,
+    tk_r1,
+    tk_r1,
+    
     
     tk_label,
     
@@ -103,6 +101,8 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     
     char* current = &data[0];
     
+    struct token* last_token;
+    
     while(true)
     {
         
@@ -119,8 +119,12 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
             }break;
             case ':':
             {
+                last_token.type = tk_label;
                 new_token.type = tk_colon;
                 new_token.lexeme[0] = ':';
+                
+                current ++;
+                lexi->num_tokens++;
             }break;
             
             // skip comments until it finds a new line
@@ -133,10 +137,10 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 }
             }break;
             // fall through
+            case '\t':
             case '\n':
             case ' ':
             {
-                
                 current++;
             }break;
             case '\0':
@@ -182,34 +186,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                         lexeme_len++;
                         peek++;
                     }
-                    
-                    // anything starting with r is reserved for registers
-                    switch(new_token.lexeme[0])
-                    {
-                        case 'r':
-                        {
-                            if(is_digit(new_token.lexeme[1]))
-                            {
-                                i32 reg_num = CHAR_TO_INT(new_token.lexeme[1]);
-                                new_token.type = reg_num + token_type_reg_offset;
-                            }
-                            else
-                            {
-                                INVALID_CODE_PATH();
-                            }
-                            
-                        }break;
-                        
-                    }
-                    
-                    for(i32 i = movv; i <opcode_num; i ++)
-                    {
-                        if(strcmp(new_token.lexeme,opcode_str[i]) == 0)
-                        {
-                            new_token.type = token_type_op_offset + i;
-                            break;
-                        }
-                    }
+                    new_token.type = tk_iden;
                     
                     lexi->num_tokens ++;
                     current += lexeme_len;
@@ -222,7 +199,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 
             }break;
             
-            
+            last_token = &new_token;
         }
     }
     
@@ -394,11 +371,27 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
         switch (_token->type)
         {
             //todo(facts):
-            case tk_addv:
-            case tk_movv:
+            case tk_opcode:
             {
                 struct Node* instr = &parser->instr[parser->num_instr];
-                instr->type = NODE_INSTR_RV;
+                
+                if(strcmp(instr->instr_node.lexeme,"movv") || strcmp(instr->instr_node.lexeme. "addv"))
+                {
+                    instr->type = NODE_INSTR_RV;
+                    
+                }
+                else if(strcmp(instr->instr_node.lexeme, "addr") || strcmp(instr->instr_node.lexeme,"movr"))
+                {
+                    instr->type = NODE_INSTR_RR;
+                }
+                else if(strcmp(instr->instr_node.lexeme,"jmp"))
+                {
+                    instr->type = NODE_INSTR_L;
+                }
+                else
+                {
+                    INVALID_CODE_PATH();
+                }
                 // Note(facts): Unsure about this. Should I just make
                 // my opcode node an OpNode or leave it as a generic Node*
                 instr->instr_node.opcode = push_struct(arena,struct Node);
@@ -412,45 +405,22 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
                 instr->instr_node.param1 = param1;
                 _token++;            
                 
-                if(_token->type != tk_comma)
+                if(_token->type == tk_comma)
                 {
-                    printf("%s expects two arguments. One received", _token->lexeme);
+                    //skip comma
+                    _token++;
+                    
+                    struct Node* param2 = push_struct(arena,struct Node);
+                    parse_param_token(param2,_token);
+                    instr->instr_node.param2 = param2;
+                    _token++;
                 }
-                _token++;
                 
-                struct Node* param2 = push_struct(arena,struct Node);
-                parse_param_token(param2,_token);
-                instr->instr_node.param2 = param2;
-                _token++;                     
+                
             }break;
-            case tk_addr:
-            case tk_movr:
+            case tk_label:
             {
-                struct Node* instr = &parser->instr[parser->num_instr];
-                instr->type = NODE_INSTR_RR;
-                // Note(facts): Unsure about this. Should I just make
-                // my opcode node an OpNode or leave it as a generic Node*
-                instr->instr_node.opcode = push_struct(arena,struct Node);
-                instr->instr_node.opcode->op_node.token = *_token; 
-                instr->instr_node.opcode->type = NODE_OP;
-                _token++;
-                parser->num_instr++;
                 
-                struct Node* param1 = push_struct(arena,struct Node);
-                parse_param_token(param1,_token);
-                instr->instr_node.param1 = param1;
-                _token++;            
-                
-                if(_token->type != tk_comma)
-                {
-                    printf("%s expects two arguments. One received", _token->lexeme);
-                }
-                _token++;
-                
-                struct Node* param2 = push_struct(arena,struct Node);
-                parse_param_token(param2,_token);
-                instr->instr_node.param2 = param2;
-                _token++;   
             }break;
             case tk_terminate:
             {

@@ -39,6 +39,7 @@ enum opcode_type
     movr,
     addv,
     addr,
+    jmp,
     opcode_num
 };
 
@@ -49,6 +50,7 @@ global const char* opcode_str[opcode_num] =
     "movr",
     "addv",
     "addr",
+    "jmp",
 };
 
 
