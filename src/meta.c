@@ -10,6 +10,10 @@
 // also remove all edge cases.
 // write them to a file
 
+// edge cases
+// Comments break this. Ignore comments inside of enums
+// ignore whitespace properly. tabs and some extra spaces break this
+
 #include <string.h>
 
 struct output_enum_string

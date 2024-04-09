@@ -238,6 +238,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     print_tokens(lexi);
 }
 
+//gen_string_from_enum
 enum NODE_TYPE
 {
     NODE_INVALID,
