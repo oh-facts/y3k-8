@@ -1,10 +1,14 @@
 // lexer, then parser, then assembler
 
-// IdEAA PHATTEE: When parsing tokens, if something is a string, I can just check the next token and based on that go back and change the previous one.
-// For labels, that works wonderfully. For instructions and parameters, I will have to think how I want it to work. (working on this)
+// IdEAA PHATTEE: When parsing tokens, if something is a string, I can just check the next token
+// and based on that go back and change the previous one. For labels, that works wonderfully. 
+// For instructions and parameters, I will have to think how I want it to work. (working on this)
+// Worst idea I have ever had in my life. Apart from <retracted>. 
+// My lexer should not care about syntax. It merely converts characters into tokens. These tokens
+// might be reserved words (registers, opcodes, punctuators), or made up words (variable names, numbers)
 
 // Store hashed lexemes alongside lexemes? (no)
-// idea: Why don't I just store exact opcode or register as a token? (doing)
+// idea: Why don't I just store exact opcode or register as a token? (did)
 // todo(facts): Stick to some coding convention (not doing)
 // make token nodes more useful. store tokens anyways, but also store other useful info
 // Make an enum to string generator (doing)
@@ -47,7 +51,7 @@ typedef enum token_type token_type;
 
 global char* token_type_str[tk_num] = 
 {
-    "INVALID", "r1", "r2", "r3", "r4", "r5", "r6", "r7""REGISTER", "LITERAL", "COMMA", "TERMINATE"
+    "INVALID", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "REGISTER", "LITERAL", "COMMA", "TERMINATE"
 };
 
 struct token
@@ -226,6 +230,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     
     exit:
     new_token.type = tk_terminate;
+    new_token.lexeme[0] = 'a';
     lexi->num_tokens++;
     
     AssertM(lexi->num_tokens <= max_tokens, "too many tokens");
@@ -308,7 +313,7 @@ struct parser
 
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look
 // better
-/*
+
 internal void print_node(struct Node* node)
 {
     switch(node->type)
@@ -356,72 +361,126 @@ internal void print_nodes(struct parser* parser)
     printl("Parser Output");
     printl("---------------");
     
-    for(i32 i = 0; i < parser->num_instr; i ++)
+    struct Node* curr = parser->first;
+    u32 count = 0;
+    while(curr)
     {
-        printl("Instruction %d",i);
-        print_node(&parser->instr[i]);
+        printl("Statement %d",count);
+        print_node(curr);
+        curr = curr->next;
+        count ++;
     }
     printl("---------------");
     printn();
 }
-*/
-internal struct Node*  make_lit_node(struct token* token, struct Arena* arena)
+
+
+internal struct Node* make_op_node(struct parser* parser, struct Arena* arena)
+{
+    struct Node* out = push_struct(arena, struct Node);
+    out->type = NODE_OP;
+    out->token = *parser->tokens;
+    out->op_node.type = parser->tokens->type - token_type_op_offset;
+    
+    //consume
+    parser->tokens++;
+
+    return out;
+}
+
+internal struct Node*  make_lit_node(struct parser* parser, struct Arena* arena)
 {
     struct Node* out  = push_struct(arena,struct Node);
     out->type = NODE_LITERAL;
-    out->token = *token;
-    out->lit_node.num = atoi(token->lexeme);
+    out->token = *parser->tokens;
+    out->lit_node.num = atoi(parser->tokens->lexeme);
+
+    //consume
+    parser->tokens++;
+
     return out;
 }
 
-internal struct Node*  make_reg_node(struct token* token, struct Arena* arena)
+internal struct Node*  make_reg_node(struct parser* parser, struct Arena* arena)
 {
     struct Node* out  = push_struct(arena,struct Node);
     out->type = NODE_REGISTER;
-    out->token = *token;
-    out->reg_node.type = token->type - token_type_reg_offset;
+    out->token = *parser->tokens;
+    out->reg_node.type = parser->tokens->type - token_type_reg_offset;
+
+    //consume
+    parser->tokens++;
+    
     return out;
 }
 
-/*
-    Write now the trees are purely made up of nodes or tokens.
-    I normally represet literals and other symbols with primitives
-    but I think I prefer them as tokens. Maybe I can have another
-    step where I convert them to primitives from tokens? Or maybe that
-    is a job for my assembler?
-*/
+internal struct Node* make_instr_rr(struct parser* parser, struct Arena* arena)
+{
+    struct Node* out = push_struct(arena, struct Node);
+    out->type = NODE_INSTR_RR;
+    out->token = *parser->tokens;
+
+    out->instr_node.opcode = make_op_node(parser, arena);
+
+    out->instr_node.param1 = make_reg_node(parser, arena);
+    
+    // consume ","
+    parser->tokens++;
+
+    out->instr_node.param2 = make_reg_node(parser,arena);
+
+    return out;
+}
+
+internal struct Node* make_instr_rv(struct parser* parser, struct Arena* arena)
+{
+    struct Node* out = push_struct(arena, struct Node);
+    out->type = NODE_INSTR_RV;
+    out->token = *parser->tokens;
+
+    out->instr_node.opcode = make_op_node(parser, arena);
+    
+    out->instr_node.param1 = make_reg_node(parser, arena);
+    
+    // consume ","
+    parser->tokens++;
+
+    out->instr_node.param2 = make_lit_node(parser,arena);
+
+    return out;
+}
+
 internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Arena* arena)
 {
     parser->memory = push_array(arena, struct Node, 1024);
     parser->first  = &parser->memory[0];
-    struct token* _token = lexi->tokens;
+    parser->tokens = lexi->tokens;
 
     struct Node* curr = parser->first; 
-    
-    while(_token->type != tk_terminate)
+    while(parser->tokens->type != tk_terminate)
     {
-        switch (_token->type)
+        switch (parser->tokens->type)
         {
             case tk_movv:
             case tk_addv:
             {
-
+                curr->next = make_instr_rv(parser,arena);
             }break;
             case tk_movr:
             case tk_addr:
             {
-
+                curr->next = make_instr_rr(parser,arena);
             }break;
             default:
             {
-                _token++;
+               INVALID_CODE_PATH();
             }
         }
 
         curr = curr->next;
     }    
     
-    //print_nodes(parser);
+    print_nodes(parser);
     
 }
 
@@ -431,14 +490,12 @@ u8* assemble(struct parser* parser, struct Arena* arena)
     u32 bindex = 0;
     
     struct Node* node = parser->first;
+    node = node->next;
     while(node)
     {
        
         switch(node->type)
         {
-            // How is this any better than movv addv, movr, addr? RV, RR makes no sense. worst idea.
-            // opcode node, reg node.
-        
             case NODE_INSTR_RV:
             {
                 bin[bindex++] = node->instr_node.opcode->op_node.type;  
