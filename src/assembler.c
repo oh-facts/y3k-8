@@ -121,6 +121,8 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
             {
                 new_token.type = tk_colon;
                 new_token.lexeme[0] = ':';
+                current ++;
+                lexi->num_tokens++;
             }break;
             
             // skip comments until it finds a new line
