@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "common.h"
 #include "platform.c"
 
@@ -10,6 +12,15 @@
 // write them to a file
 
 #include <string.h>
+
+struct output_enum_string
+{
+    // big chunk of whole thing separated with commas
+    char* string;
+
+    char* enum_name;
+};
+
 b32 match_word(char* start, const char* match, u32 size)
 {
     if(memcmp(start, match, size) == 0)
@@ -28,16 +39,35 @@ void extract(char* start)
     // verify
     char* peek = start + enum_gen_size;
     ++peek;
-    
     if(match_word(peek, "enum", strlen("enum")))
     {
+        // skip enum keyword
         peek += strlen("enum");
         
+        /*
+            capture name
+        */
+        
+        // skip whitespace
+        // make a function to do this and also skip \t and \n
+        while(*(++peek) == ' ')
+        {
+        
+        }
+        char* name_start = peek;
+        u32 name_size = 0;
         while(*(++peek) != '{')
         {
-            
+            name_size++;
         }
         
+        {
+            char buffer[128] = {0};
+            memcpy(buffer, name_start, name_size);
+            printl("const char* %s[]={", buffer);
+        }
+                
+
         // remove {
         ++peek;
         
@@ -46,17 +76,29 @@ void extract(char* start)
         
         while(*(++peek) != '}')
         {
+            if(*peek == ' ' || *peek == '\n' || *peek == '\t')
+            {
+                beg = peek;
+                continue;
+            }
             len++;
             if(*peek == ',')
             {
+                // remove starting ' '
+                beg++;
+
+                // remove comma
+                len--;
+                
                 char buffer[128] = {0};
                 memcpy(buffer, beg, len);
-                printf("%s\n", buffer);
+                printf("\"%s\",\n", buffer);
                 
                 beg = peek;
                 len = 0;
             }
         }
+        printl("};");
     }
     
 }
@@ -85,5 +127,7 @@ int main(int argc, char* argv[])
             }
         }
     }
+
+   // yk_write_to_file("../src/meta/enum_strings.h", hi);
     return 0;
 }
