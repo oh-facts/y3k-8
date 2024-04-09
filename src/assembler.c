@@ -32,8 +32,7 @@ enum token_type
     tk_addv,
     tk_addr,
     
-    tk_label,
-    
+    tk_iden,
     tk_lit,
     tk_comma,
     tk_colon,
@@ -148,6 +147,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
             }break;
             default:
             {
+                // if it starts with a number, its always a literal
                 if(is_digit(*current))
                 {
                     //ToDo(facts): hexadecimal support. check for 0x
@@ -173,6 +173,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     current += len;
                 }
                 
+                // either a keyword or an identifier
                 else if(is_alpha(*current))
                 {
                     char* peek = current;
@@ -186,34 +187,28 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                         peek++;
                     }
                     
-                    // anything starting with r is reserved for registers
-                    switch(new_token.lexeme[0])
+                    // is reg?
+                    if(new_token.lexeme[0] == 'r' && is_digit(new_token.lexeme[1]))
                     {
-                        case 'r':
-                        {
-                            if(is_digit(new_token.lexeme[1]))
-                            {
-                                i32 reg_num = CHAR_TO_INT(new_token.lexeme[1]);
-                                new_token.type = reg_num + token_type_reg_offset;
-                            }
-                            else
-                            {
-                                INVALID_CODE_PATH();
-                            }
-                            
-                        }break;
-                        
+                        i32 reg_num = CHAR_TO_INT(new_token.lexeme[1]);
+                        new_token.type = reg_num + token_type_reg_offset;
+                        goto found;
                     }
                     
+                    // is opcode?
                     for(i32 i = movv; i <opcode_num; i ++)
                     {
                         if(strcmp(new_token.lexeme,opcode_str[i]) == 0)
                         {
                             new_token.type = token_type_op_offset + i;
-                            break;
+                            goto found;
                         }
                     }
                     
+                    // is identifier!
+                    new_token.type = tk_iden;
+                    
+                    found:
                     lexi->num_tokens ++;
                     current += lexeme_len;
                     
@@ -241,8 +236,12 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 enum NODE_TYPE
 {
     NODE_INVALID,
+    
+    // statements
     NODE_INSTR_RR,
     NODE_INSTR_RV,
+
+    // types
     NODE_OP,
     NODE_LITERAL,
     NODE_REGISTER,
@@ -286,6 +285,8 @@ typedef struct InstrNode
 struct Node
 {
     struct token token;
+    struct Node* next;
+
     NODE_TYPE type;
     union
     {
@@ -298,13 +299,16 @@ struct Node
 
 struct parser
 {
-    // for now my asm is just a set of instructions
-    struct Node* instr;
-    i32 num_instr;
+    struct Node* memory;
+    u32 num_nodes;
+
+    struct Node* first;
+    struct token* tokens;
 };
 
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look
 // better
+/*
 internal void print_node(struct Node* node)
 {
     switch(node->type)
@@ -328,15 +332,15 @@ internal void print_node(struct Node* node)
         }break;
         case NODE_OP:
         {
-            printl("Opcode: %s", node->op_node.token.lexeme);
+            printl("Opcode: %s", node->token.lexeme);
         }break;
         case NODE_REGISTER:
         {
-            printl("Register %s", node->reg_node.token.lexeme);
+            printl("Register %s", node->token.lexeme);
         }break;
         case NODE_LITERAL:
         {
-            printl("Literal %s", node->lit_node.token.lexeme);
+            printl("Literal %s", node->token.lexeme);
         }break;
         
         default:
@@ -360,23 +364,23 @@ internal void print_nodes(struct parser* parser)
     printl("---------------");
     printn();
 }
-
-internal void parse_param_token(struct Node* param, const struct token* token)
+*/
+internal struct Node*  make_lit_node(struct token* token, struct Arena* arena)
 {
-    if(token->type == tk_lit)
-    {
-        param->type = NODE_LITERAL;
-        param->lit_node.token = *token;
-    }
-    else if(token->type >= tk_r1 && token->type <=tk_r8)
-    {
-        param->type = NODE_REGISTER;
-        param->reg_node.token = *token;
-    }
-    else
-    {
-        INVALID_CODE_PATH();
-    }
+    struct Node* out  = push_struct(arena,struct Node);
+    out->type = NODE_LITERAL;
+    out->token = *token;
+    out->lit_node.num = atoi(token->lexeme);
+    return out;
+}
+
+internal struct Node*  make_reg_node(struct token* token, struct Arena* arena)
+{
+    struct Node* out  = push_struct(arena,struct Node);
+    out->type = NODE_REGISTER;
+    out->token = *token;
+    out->reg_node.type = token->type - token_type_reg_offset;
+    return out;
 }
 
 /*
@@ -388,88 +392,36 @@ internal void parse_param_token(struct Node* param, const struct token* token)
 */
 internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Arena* arena)
 {
+    parser->memory = push_array(arena, struct Node, 1024);
+    parser->first  = &parser->memory[0];
     struct token* _token = lexi->tokens;
+
+    struct Node* curr = parser->first; 
     
-    parser->instr = push_array(arena, struct Node, 1024);
-    parser->num_instr = 0;
-    
-    while(true)
+    while(_token->type != tk_terminate)
     {
         switch (_token->type)
         {
-            //todo(facts):
-            case tk_addv:
             case tk_movv:
+            case tk_addv:
             {
-                struct Node* instr = &parser->instr[parser->num_instr];
-                instr->type = NODE_INSTR_RV;
-                // Note(facts): Unsure about this. Should I just make
-                // my opcode node an OpNode or leave it as a generic Node*
-                instr->instr_node.opcode = push_struct(arena,struct Node);
-                instr->instr_node.opcode->op_node.token = *_token; 
-                instr->instr_node.opcode->type = NODE_OP;
-                _token++;
-                parser->num_instr++;
-                
-                struct Node* param1 = push_struct(arena,struct Node);
-                parse_param_token(param1,_token);
-                instr->instr_node.param1 = param1;
-                _token++;            
-                
-                if(_token->type != tk_comma)
-                {
-                    printf("%s expects two arguments. One received", _token->lexeme);
-                }
-                _token++;
-                
-                struct Node* param2 = push_struct(arena,struct Node);
-                parse_param_token(param2,_token);
-                instr->instr_node.param2 = param2;
-                _token++;                     
+
             }break;
-            case tk_addr:
             case tk_movr:
+            case tk_addr:
             {
-                struct Node* instr = &parser->instr[parser->num_instr];
-                instr->type = NODE_INSTR_RR;
-                // Note(facts): Unsure about this. Should I just make
-                // my opcode node an OpNode or leave it as a generic Node*
-                instr->instr_node.opcode = push_struct(arena,struct Node);
-                instr->instr_node.opcode->op_node.token = *_token; 
-                instr->instr_node.opcode->type = NODE_OP;
-                _token++;
-                parser->num_instr++;
-                
-                struct Node* param1 = push_struct(arena,struct Node);
-                parse_param_token(param1,_token);
-                instr->instr_node.param1 = param1;
-                _token++;            
-                
-                if(_token->type != tk_comma)
-                {
-                    printf("%s expects two arguments. One received", _token->lexeme);
-                }
-                _token++;
-                
-                struct Node* param2 = push_struct(arena,struct Node);
-                parse_param_token(param2,_token);
-                instr->instr_node.param2 = param2;
-                _token++;   
-            }break;
-            case tk_terminate:
-            {
-                goto exit;
+
             }break;
             default:
             {
                 _token++;
             }
         }
-    }
+
+        curr = curr->next;
+    }    
     
-    exit:
-    
-    print_nodes(parser);
+    //print_nodes(parser);
     
 }
 
@@ -478,31 +430,32 @@ u8* assemble(struct parser* parser, struct Arena* arena)
     u8* bin = push_array(arena, u8, 100);
     u32 bindex = 0;
     
-    
-    
-    for(i32 i = 0; i < parser->num_instr; i ++)
+    struct Node* node = parser->first;
+    while(node)
     {
-        struct Node* instr = &parser->instr[i];
-        struct InstrNode* instr_node = &instr->instr_node;
-        
-        switch(instr->type)
+       
+        switch(node->type)
         {
+            // How is this any better than movv addv, movr, addr? RV, RR makes no sense. worst idea.
+            // opcode node, reg node.
+        
             case NODE_INSTR_RV:
             {
-                bin[bindex++] = instr_node->opcode->op_node.token.type - token_type_op_offset;
-                bin[bindex++] = instr_node->param1->reg_node.token.type - token_type_reg_offset;
+                bin[bindex++] = node->instr_node.opcode->op_node.type;  
                 
-                // store literal values inside of the node
-                bin[bindex++] = atoi(instr_node->param2->lit_node.token.lexeme);
+                bin[bindex++] = node->instr_node.param1->reg_node.type;  
+                
+                bin[bindex++] = node->instr_node.param2->lit_node.num;
                 
             }break;
             
             case NODE_INSTR_RR:
             {
-                bin[bindex++] = instr_node->opcode->op_node.token.type - token_type_op_offset;
-                bin[bindex++] = instr_node->param1->reg_node.token.type - token_type_reg_offset;
+                bin[bindex++] = node->instr_node.opcode->op_node.type;  
                 
-                bin[bindex++] = instr_node->param2->reg_node.token.type - token_type_reg_offset;
+                bin[bindex++] = node->instr_node.param1->reg_node.type;  
+                
+                bin[bindex++] = node->instr_node.param2->reg_node.type;
                 
             }break;
             default:
@@ -511,6 +464,7 @@ u8* assemble(struct parser* parser, struct Arena* arena)
             }
         }
         
+        node = node->next;
         
     }   
     

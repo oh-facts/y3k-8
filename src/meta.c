@@ -74,6 +74,7 @@ int main(int argc, char* argv[])
     
     while(*(++peek) != '\0')
     {
+        // g...
         if(*peek == 'g')
         {
             if(match_word(peek, enum_gen, enum_gen_size ))
