@@ -2,6 +2,6 @@
 
 global const char* str_enum_device_state[] =
 {
-"ds_off",
-"ds_on",
+	"ds_off",
+	"ds_on",
 };

@@ -1,17 +1,6 @@
 // lexer, then parser, then assembler
 
-// IdEAA PHATTEE: When parsing tokens, if something is a string, I can just check the next token
-// and based on that go back and change the previous one. For labels, that works wonderfully. 
-// For instructions and parameters, I will have to think how I want it to work. (working on this)
-// Worst idea I have ever had in my life. Apart from <retracted>. 
-// My lexer should not care about syntax. It merely converts characters into tokens. These tokens
-// might be reserved words (registers, opcodes, punctuators), or made up words (variable names, numbers)
-
-// Store hashed lexemes alongside lexemes? (no)
-// idea: Why don't I just store exact opcode or register as a token? (did)
 // todo(facts): Stick to some coding convention (not doing)
-// make token nodes more useful. store tokens anyways, but also store other useful info
-// Make an enum to string generator (doing)
 
 #define CHAR_TO_INT(c) ((c) - '0')
 

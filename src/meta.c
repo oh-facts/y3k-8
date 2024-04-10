@@ -189,7 +189,7 @@ void extract(char* data, struct Arena* arena)
                     for(i32 i = 0; i < token_num; i ++)
                     {
                         printl("\"%s\",",tokens[i].lexeme);
-                        fprintf(file, "\"%s\",\n", tokens[i].lexeme);
+                        fprintf(file, "\t\"%s\",\n", tokens[i].lexeme);
                     }
                     printl("};");
                     fprintf(file, "};");
