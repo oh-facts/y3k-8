@@ -133,8 +133,10 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
             {
                 while(*(++current) != '\n')
                 {
-                    //printf("%c",*current);
-                    // :)
+                    if(*current == '\0')
+                    {
+                        break;
+                    }
                 }
             }break;
             // fall through

@@ -6,7 +6,6 @@
 
 // todo
 // will require people testing it to come up with a good api.
-// write them to a file
 
 // I think I have fixed all edge cases?
 // Only need to clean it up and abuse file writing lesser
@@ -222,11 +221,10 @@ int main(int argc, char* argv[])
     {
         char* data = yk_read_text_file(files[i], &arena);
         extract(data,&arena);
+
+        arena.used = 0;
+        memset(arena.base,0, arena.size);
     }
     
-    //printf("%s",data);
-    
-    
-    // yk_write_to_file("../src/meta/enum_strings.h", hi);
     return 0;
 }
