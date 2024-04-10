@@ -106,7 +106,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     
     char* current = &data[0];
     
-    while(true)
+    while(*current != '\0')
     {
         
         switch(*current)
@@ -144,10 +144,6 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
             {
                 
                 current++;
-            }break;
-            case '\0':
-            {
-                goto exit;
             }break;
             default:
             {
@@ -228,7 +224,6 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
         }
     }
     
-    exit:
     new_token.type = tk_terminate;
     new_token.lexeme[0] = 'a';
     lexi->num_tokens++;
