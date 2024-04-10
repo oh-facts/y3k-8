@@ -1,8 +1,24 @@
 #include "common.h"
+
+// meta
+#include "meta/str_enum_device_state.h"
+#include "meta/str_enum_device_type.h"
+#include "meta/str_enum_NODE_TYPE.h"
+#include "meta/str_enum_opcode_type.h"
+#include "meta/str_enum_register_type.h"
+#include "meta/str_enum_token_type.h"
+//
+
+// ---
+#include "meta.h"
 #include "language.h"
 #include "computer.c"
 #include "assembler.c"
 #include "platform.c"
+
+
+
+
 
 int main(int argc, char *argv[])
 {

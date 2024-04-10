@@ -1,3 +1,6 @@
+#include "meta.h"
+
+gen_string_from_enum
 enum device_type
 {
     dt_invalid,
@@ -7,6 +10,7 @@ enum device_type
 
 typedef enum device_type device_type;
 
+gen_string_from_enum
 enum device_state
 {
     ds_off,
@@ -126,7 +130,7 @@ internal void print_registers(struct Computer* self)
     printl("---------------");
     for(i32 i = r1; i < register_num; i ++)
     {
-        printl("%s : 0x%02x",register_str[i], self->reg[i]);
+        printl("%s : 0x%02x", str_enum_register_type[i], self->reg[i]);
         //printl("%s : %d",register_str[i], self->reg[i]);
     }
     printl("---------------");

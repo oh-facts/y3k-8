@@ -1,6 +1,7 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
+gen_string_from_enum
 enum register_type
 {
     invalid_register_type = 0x00,
@@ -19,21 +20,7 @@ enum register_type
 
 typedef enum register_type register_type;
 
-global const char* register_str[register_num] = 
-{
-    "INVALID REGISTER",
-    "r1",
-    "r2",
-    "r3",
-    "r4",
-    "r5",
-    "r6",
-    "r7",
-    "r8",
-    "acc",
-    "ip",
-};
-
+gen_string_from_enum
 enum opcode_type
 {
     invalid_op = 0x00,
@@ -45,15 +32,5 @@ enum opcode_type
 };
 
 typedef enum opcode_type opcode_type;
-
-global const char* opcode_str[opcode_num] = 
-{
-    "INVALID OP",
-    "movv",
-    "movr",
-    "addv",
-    "addr",
-};
-
 
 #endif

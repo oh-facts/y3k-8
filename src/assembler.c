@@ -13,15 +13,14 @@
 // make token nodes more useful. store tokens anyways, but also store other useful info
 // Make an enum to string generator (doing)
 
-#include "meta.h"
-
 #define CHAR_TO_INT(c) ((c) - '0')
 
 gen_string_from_enum
-enum token_type
+enum token_type 
 {
     tk_invalid,
     
+    // registers
     tk_r1,
     tk_r2,
     tk_r3,
@@ -31,15 +30,21 @@ enum token_type
     tk_r7,
     tk_r8,
     
+    // op
     tk_movv,
     tk_movr,
     tk_addv,
     tk_addr,
     
+    // keywords
     tk_iden,
     tk_lit,
+    
+    // punctuators
     tk_comma,
     tk_colon,
+    
+    // misc
     tk_terminate,
     tk_num
 };
@@ -48,11 +53,6 @@ typedef enum token_type token_type;
 
 #define token_type_op_offset (tk_movv - 1)
 #define token_type_reg_offset (tk_r1 - 1)
-
-global char* token_type_str[tk_num] = 
-{
-    "INVALID", "r1", "r2", "r3", "r4", "r5", "r6", "r7", "REGISTER", "LITERAL", "COMMA", "TERMINATE"
-};
 
 struct token
 {
@@ -84,7 +84,7 @@ internal void print_tokens(struct lexer* lexi)
     
     for(i32 i = 0; i < lexi->num_tokens; i ++)
     {
-        printf("%d %s %s\n", i, token_type_str[lexi->tokens[i].type], lexi->tokens[i].lexeme);
+        printf("%d %s %s\n", i, str_enum_token_type[lexi->tokens[i].type], lexi->tokens[i].lexeme);
     }
     
     printl("---------------");
@@ -202,7 +202,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     // is opcode?
                     for(i32 i = movv; i <opcode_num; i ++)
                     {
-                        if(strcmp(new_token.lexeme,opcode_str[i]) == 0)
+                        if(strcmp(new_token.lexeme,str_enum_opcode_type[i]) == 0)
                         {
                             new_token.type = token_type_op_offset + i;
                             goto found;
@@ -238,7 +238,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     print_tokens(lexi);
 }
 
-//gen_string_from_enum
+gen_string_from_enum
 enum NODE_TYPE
 {
     NODE_INVALID,
@@ -246,7 +246,7 @@ enum NODE_TYPE
     // statements
     NODE_INSTR_RR,
     NODE_INSTR_RV,
-
+    
     // types
     NODE_OP,
     NODE_LITERAL,
@@ -254,15 +254,6 @@ enum NODE_TYPE
 };
 
 typedef enum NODE_TYPE NODE_TYPE;
-
-// Note(facts): I am not using this anywhere currently. I will only use this
-// for debug purposes. Its a pain to maintain these. I must phase these out.
-// or generate them programatically. A switch case would be neater but these
-// are elegant to look at. Maybe I will generate them at some point.
-global const char* node_type_str[] = 
-{
-    "invalid", "instruction_RR","instruction_RV" , "opcode" ,"literal", "register"
-};
 
 struct OpNode
 {
@@ -292,7 +283,7 @@ struct Node
 {
     struct token token;
     struct Node* next;
-
+    
     NODE_TYPE type;
     union
     {
@@ -307,7 +298,7 @@ struct parser
 {
     struct Node* memory;
     u32 num_nodes;
-
+    
     struct Node* first;
     struct token* tokens;
 };
@@ -385,7 +376,7 @@ internal struct Node* make_op_node(struct parser* parser, struct Arena* arena)
     
     //consume
     parser->tokens++;
-
+    
     return out;
 }
 
@@ -395,10 +386,10 @@ internal struct Node*  make_lit_node(struct parser* parser, struct Arena* arena)
     out->type = NODE_LITERAL;
     out->token = *parser->tokens;
     out->lit_node.num = atoi(parser->tokens->lexeme);
-
+    
     //consume
     parser->tokens++;
-
+    
     return out;
 }
 
@@ -408,7 +399,7 @@ internal struct Node*  make_reg_node(struct parser* parser, struct Arena* arena)
     out->type = NODE_REGISTER;
     out->token = *parser->tokens;
     out->reg_node.type = parser->tokens->type - token_type_reg_offset;
-
+    
     //consume
     parser->tokens++;
     
@@ -420,16 +411,16 @@ internal struct Node* make_instr_rr(struct parser* parser, struct Arena* arena)
     struct Node* out = push_struct(arena, struct Node);
     out->type = NODE_INSTR_RR;
     out->token = *parser->tokens;
-
+    
     out->instr_node.opcode = make_op_node(parser, arena);
-
+    
     out->instr_node.param1 = make_reg_node(parser, arena);
     
     // consume ","
     parser->tokens++;
-
+    
     out->instr_node.param2 = make_reg_node(parser,arena);
-
+    
     return out;
 }
 
@@ -438,16 +429,16 @@ internal struct Node* make_instr_rv(struct parser* parser, struct Arena* arena)
     struct Node* out = push_struct(arena, struct Node);
     out->type = NODE_INSTR_RV;
     out->token = *parser->tokens;
-
+    
     out->instr_node.opcode = make_op_node(parser, arena);
     
     out->instr_node.param1 = make_reg_node(parser, arena);
     
     // consume ","
     parser->tokens++;
-
+    
     out->instr_node.param2 = make_lit_node(parser,arena);
-
+    
     return out;
 }
 
@@ -456,7 +447,7 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
     parser->memory = push_array(arena, struct Node, 1024);
     parser->first  = &parser->memory[0];
     parser->tokens = lexi->tokens;
-
+    
     struct Node* curr = parser->first; 
     while(parser->tokens->type != tk_terminate)
     {
@@ -474,10 +465,10 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
             }break;
             default:
             {
-               INVALID_CODE_PATH();
+                INVALID_CODE_PATH();
             }
         }
-
+        
         curr = curr->next;
     }    
     
@@ -494,7 +485,7 @@ u8* assemble(struct parser* parser, struct Arena* arena)
     node = node->next;
     while(node)
     {
-       
+        
         switch(node->type)
         {
             case NODE_INSTR_RV:
