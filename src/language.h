@@ -28,6 +28,7 @@ enum opcode_type
     movr,
     addv,
     addr,
+    jmp,
     opcode_num
 };
 

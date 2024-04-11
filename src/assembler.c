@@ -24,6 +24,7 @@ enum token_type
     tk_movr,
     tk_addv,
     tk_addr,
+    tk_jmp,
     
     // keywords
     tk_iden,
