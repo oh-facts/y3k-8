@@ -603,6 +603,17 @@ u8* assemble(struct parser* parser, struct Arena* arena)
                 bin[bindex++] = node->instr_node.param2->reg_node.type;
                 
             }break;
+
+            case NODE_LABEL_DECL:
+            {
+                bin[80] = bindex; 
+            }break;
+
+            case NODE_INSTR_L:
+            {
+                bin[bindex++] = node->instr_node_l.opcode->op_node.type;
+                bin[bindex++] = bin[80];
+            }break;
             default:
             {
                 INVALID_CODE_PATH();

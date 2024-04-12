@@ -116,6 +116,21 @@ internal void execute(struct Computer *self)
                 self->reg[dst] += self->reg[src];
                 
             }break;
+
+            case jmp:
+            {
+                next(self);
+                static b32 ew = false;
+                if(!ew)
+                {
+                    self->reg[ip] = fetch(self);
+                    ew = true;
+                }
+                else
+                {
+                    next(self);
+                }
+            }break;
             
             default:
             return;
