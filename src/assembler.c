@@ -233,11 +233,14 @@ enum NODE_TYPE
     // statements
     NODE_INSTR_RR,
     NODE_INSTR_RV,
-    
+    NODE_INSTR_L,
+    NODE_LABEL_DECL,
+
     // types
     NODE_OP,
     NODE_LITERAL,
     NODE_REGISTER,
+    NODE_LABEL,
 };
 
 typedef enum NODE_TYPE NODE_TYPE;
@@ -257,6 +260,16 @@ struct RegNode
     register_type type;
 };
 
+struct LabelDeclNode
+{
+    u8 temp;
+};
+
+struct LabelNode
+{
+    struct Node* origin;
+};
+
 struct Node;
 
 typedef struct InstrNode
@@ -266,6 +279,12 @@ typedef struct InstrNode
     struct Node* param2;
 }InstrNodeRR, InstrNodeRV;
 
+struct InstrNodeL
+{
+    struct Node* opcode;
+    struct Node* label;
+};
+
 struct Node
 {
     struct token token;
@@ -274,10 +293,16 @@ struct Node
     NODE_TYPE type;
     union
     {
+        // statements
         struct InstrNode instr_node;
+        struct InstrNodeL instr_node_l;
+        struct LabelDeclNode label_decl_node;
+        
+        // types
         struct OpNode op_node;
         struct LitNode lit_node;
         struct RegNode reg_node;
+        struct LabelNode label_node;
     };
 };
 
@@ -353,6 +378,27 @@ internal void print_nodes(struct parser* parser)
     printn();
 }
 
+/*
+    Iterates through nodes and returns parent label
+*/
+internal struct Node* get_origin_label_decl_node(struct parser* parser, struct Node* node)
+{
+    struct Node* curr = parser->first;
+    while(curr)
+    {
+        if(curr->type == NODE_LABEL_DECL)
+        {
+            if(strcmp(curr->token.lexeme, node->token.lexeme) == 0)
+            {
+                return curr;
+            }
+        }
+        curr = curr->next;
+    }
+
+    // Assert
+    return 0;
+}
 
 internal struct Node* make_op_node(struct parser* parser, struct Arena* arena)
 {
@@ -393,6 +439,17 @@ internal struct Node*  make_reg_node(struct parser* parser, struct Arena* arena)
     return out;
 }
 
+internal struct Node* make_label_node(struct parser* parser, struct Arena* arena)
+{
+    struct Node* out = push_struct(arena, struct Node);
+    out->type = NODE_LABEL;
+    out->token = *parser->tokens;
+    out->label_node.origin = get_origin_label_decl_node(parser, out);
+    return out;
+}
+
+// Parsing Statements
+
 internal struct Node* make_instr_rr(struct parser* parser, struct Arena* arena)
 {
     struct Node* out = push_struct(arena, struct Node);
@@ -429,6 +486,31 @@ internal struct Node* make_instr_rv(struct parser* parser, struct Arena* arena)
     return out;
 }
 
+internal struct Node* make_instr_l(struct parser* parser, struct Arena* arena)
+{
+    struct Node* out = push_struct(arena, struct Node);
+    out->type = NODE_INSTR_L;
+    out->token = *parser->tokens;
+    
+    out->instr_node_l.opcode = make_op_node(parser, arena);
+    
+    out->instr_node_l.label = make_label_node(parser, arena);
+    
+    return out;
+}
+
+internal struct Node* make_label_decl_node(struct parser* parser, struct Arena* arena)
+{
+    struct Node* out = push_struct(arena, struct Node);
+    out->type = NODE_LABEL_DECL;
+    out->token = *parser->tokens;
+    out->label_decl_node.temp = 1;
+
+    // self and colon
+    parser->tokens +=2;
+    return out;
+}
+
 internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Arena* arena)
 {
     parser->memory = push_array(arena, struct Node, 1024);
@@ -449,6 +531,17 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
             case tk_addr:
             {
                 curr->next = make_instr_rr(parser,arena);
+            }break;
+            case tk_jmp:
+            {
+                curr->next = make_instr_l(parser, arena);
+            }break;
+            case tk_iden:
+            {
+                if((parser->tokens + 1)->type == tk_colon)
+                {
+                    curr->next = make_label_decl_node(parser,arena);
+                }
             }break;
             default:
             {
