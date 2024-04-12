@@ -9,5 +9,6 @@ global const char* str_enum_opcode_type[] =
 	"addr",
 	"jmp",
 	"jmpx",
+	"use",
 	"opcode_num",
 };

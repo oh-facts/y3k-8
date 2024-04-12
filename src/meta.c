@@ -213,11 +213,10 @@ int main(int argc, char* argv[])
     char* files[] = 
     {
         "../src/assembler.c",
-        "../src/language.h",
-        "../src/computer.c",
+        "../src/computer.h",
     };
 
-    for(i32 i = 0; i < 3; i ++)
+    for(i32 i = 0; i < 2; i ++)
     {
         char* data = yk_read_text_file(files[i], &arena);
         extract(data,&arena);

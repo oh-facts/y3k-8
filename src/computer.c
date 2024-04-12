@@ -1,28 +1,20 @@
 #include "meta.h"
 
-gen_string_from_enum
-enum device_type
+struct logger
 {
-    dt_invalid,
-    dt_logger,
-    dt_num
+    device_logger_state state;
 };
-
-typedef enum device_type device_type;
-
-gen_string_from_enum
-enum device_state
-{
-    ds_off,
-    ds_on
-};
-
-typedef enum device_state device_state;
 
 struct Device
 {
+    u8 device_slot;
     device_type type;
     device_state state;
+
+    union
+    {
+        struct logger logger;
+    };
 };
 
 i8 use_device(struct Device* device, i8 in)
@@ -35,7 +27,20 @@ i8 use_device(struct Device* device, i8 in)
         }break;
         case dt_logger:
         {
-            printf("%c",in);
+            if(device->state == ds_off)
+            {
+                //printl("logger connected with mode %s",str_enum_device_logger_state[in]);
+                device->logger.state = in;
+                device->state = ds_on;
+                return 1;
+            }
+            else
+            {
+                if(device->logger.state == dls_int)
+                printf("%d",in);
+                return in;
+            }
+            
         }break;
         default:
         {
@@ -116,19 +121,26 @@ internal void execute(struct Computer *self)
                 
             }break;
 
+            case use:
+            {
+                static struct Device dc = {0};
+                next(self);
+                
+                dc.type = self->reg[fetch(self)];
+                next(self);
+
+                u8 in = fetch(self);
+                next(self);
+
+                use_device(&dc, self->reg[in]);
+            }break;
+
             case jmp:
             {
                 next(self);
-                static b32 ew = false;
-                if(!ew)
-                {
-                    self->reg[ip] = fetch(self);
-                    ew = true;
-                }
-                else
-                {
-                    next(self);
-                }
+                
+                self->reg[ip] = fetch(self);            
+
             }break;
 
             case jmpx:

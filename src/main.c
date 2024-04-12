@@ -1,6 +1,9 @@
 #include "common.h"
 
+
+//todo(facts): make a str_enums.h and include just that.
 // meta
+#include "meta/str_enum_device_logger_state.h"
 #include "meta/str_enum_device_state.h"
 #include "meta/str_enum_device_type.h"
 #include "meta/str_enum_NODE_TYPE.h"
@@ -11,7 +14,7 @@
 
 // ---
 #include "meta.h"
-#include "language.h"
+#include "computer.h"
 #include "computer.c"
 #include "assembler.c"
 #include "platform.c"
@@ -23,9 +26,9 @@
 int main(int argc, char *argv[])
 {
     AssertM(argc == 2, "Usage: ./out \"filename\" ");
-    printf("beep boop beep\n");
+    printl("beep boop beep");
     
-    printf("%s\n",argv[1]);
+    printl("%s\n",argv[1]);
     
     size_t mem_size = Megabytes(1);
     struct Arena arena;
@@ -45,8 +48,10 @@ int main(int argc, char *argv[])
     
     execute(&comp);
     
-    print_registers(&comp);
+    //print_registers(&comp);
     
+    printn();
+    printn();
     printf("exited\n");
     
 }

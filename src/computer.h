@@ -30,9 +30,38 @@ enum opcode_type
     addr,
     jmp,
     jmpx,
+    use,
     opcode_num
 };
 
 typedef enum opcode_type opcode_type;
+
+gen_string_from_enum
+enum device_type
+{
+    dt_invalid,
+    dt_logger,
+    dt_num
+};
+
+typedef enum device_type device_type;
+
+gen_string_from_enum
+enum device_state
+{
+    ds_off,
+    ds_on
+};
+
+typedef enum device_state device_state;
+
+gen_string_from_enum
+enum device_logger_state
+{
+    dls_int,
+    dls_char
+};
+
+typedef enum device_logger_state device_logger_state;
 
 #endif

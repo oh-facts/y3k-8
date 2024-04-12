@@ -26,6 +26,7 @@ enum token_type
     tk_addr,
     tk_jmp,
     tk_jmpx,
+    tk_use,
     
     // keywords
     tk_iden,
@@ -223,7 +224,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     
     AssertM(lexi->num_tokens <= max_tokens, "too many tokens");
     
-    print_tokens(lexi);
+    //print_tokens(lexi);
 }
 
 gen_string_from_enum
@@ -237,6 +238,7 @@ enum NODE_TYPE
     NODE_INSTR_L,
     NODE_INSTR_LL,
     NODE_LABEL_DECL,
+    NODE_USE,
 
     // types
     NODE_OP,
@@ -576,6 +578,7 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
             }break;
             case tk_movr:
             case tk_addr:
+            case tk_use:
             {
                 curr->next = make_instr_rr(parser,arena);
             }break;
@@ -603,7 +606,7 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
         curr = curr->next;
     }    
     
-    print_nodes(parser);
+    //print_nodes(parser);
     
 }
 
