@@ -351,6 +351,21 @@ internal void print_node(struct Node* node)
         {
             printl("Literal %s", node->token.lexeme);
         }break;
+        case NODE_LABEL:
+        {
+            printl("Label %s", node->token.lexeme);
+        }break;
+        case NODE_INSTR_L:
+        {
+            print_node(node->instr_node_l.opcode);
+            print_node(node->instr_node_l.label);
+            printn();
+        }break;
+        case NODE_LABEL_DECL:
+        {
+            printl("Label Decl %s",node->token.lexeme);
+            printn();
+        }break;
         
         default:
         {
@@ -445,6 +460,7 @@ internal struct Node* make_label_node(struct parser* parser, struct Arena* arena
     out->type = NODE_LABEL;
     out->token = *parser->tokens;
     out->label_node.origin = get_origin_label_decl_node(parser, out);
+    parser->tokens++;
     return out;
 }
 
