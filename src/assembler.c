@@ -25,6 +25,7 @@ enum token_type
     tk_addv,
     tk_addr,
     tk_jmp,
+    tk_jmpx,
     
     // keywords
     tk_iden,
@@ -234,6 +235,7 @@ enum NODE_TYPE
     NODE_INSTR_RR,
     NODE_INSTR_RV,
     NODE_INSTR_L,
+    NODE_INSTR_LL,
     NODE_LABEL_DECL,
 
     // types
@@ -279,10 +281,18 @@ typedef struct InstrNode
     struct Node* param2;
 }InstrNodeRR, InstrNodeRV;
 
+// todo(facts): I just realized I am using L for both literals and ints. Fix this.
 struct InstrNodeL
 {
     struct Node* opcode;
     struct Node* label;
+};
+
+struct InstrNodeLL
+{
+    struct Node* opcode;
+    struct Node* label;
+    struct Node* lit;
 };
 
 struct Node
@@ -296,6 +306,7 @@ struct Node
         // statements
         struct InstrNode instr_node;
         struct InstrNodeL instr_node_l;
+        struct InstrNodeLL instr_node_ll;
         struct LabelDeclNode label_decl_node;
         
         // types
@@ -360,6 +371,10 @@ internal void print_node(struct Node* node)
             print_node(node->instr_node_l.opcode);
             print_node(node->instr_node_l.label);
             printn();
+        }break;
+        case NODE_INSTR_LL:
+        {
+
         }break;
         case NODE_LABEL_DECL:
         {
@@ -515,6 +530,22 @@ internal struct Node* make_instr_l(struct parser* parser, struct Arena* arena)
     return out;
 }
 
+internal struct Node* make_instr_ll(struct parser* parser, struct Arena* arena)
+{
+    struct Node* out = push_struct(arena, struct Node);
+    out->type = NODE_INSTR_LL;
+    out->token = *parser->tokens;
+
+    out->instr_node_ll.opcode = make_op_node(parser, arena);
+    out->instr_node_ll.label = make_label_node(parser, arena);
+
+    parser->tokens++;
+
+    out->instr_node_ll.lit = make_lit_node(parser, arena);
+
+    return out;
+}
+
 internal struct Node* make_label_decl_node(struct parser* parser, struct Arena* arena)
 {
     struct Node* out = push_struct(arena, struct Node);
@@ -547,6 +578,10 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
             case tk_addr:
             {
                 curr->next = make_instr_rr(parser,arena);
+            }break;
+            case tk_jmpx:
+            {
+                curr->next = make_instr_ll(parser, arena);
             }break;
             case tk_jmp:
             {
@@ -613,6 +648,12 @@ u8* assemble(struct parser* parser, struct Arena* arena)
             {
                 bin[bindex++] = node->instr_node_l.opcode->op_node.type;
                 bin[bindex++] = bin[80];
+            }break;
+            case NODE_INSTR_LL:
+            {
+                bin[bindex++] = node->instr_node_ll.opcode->op_node.type;
+                bin[bindex++] = bin[80];
+                bin[bindex] = node->instr_node_ll.lit->lit_node.num;
             }break;
             default:
             {

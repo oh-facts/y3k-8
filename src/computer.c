@@ -102,8 +102,7 @@ internal void execute(struct Computer *self)
                 next(self);
                 u8 src = fetch(self);
                 next(self);
-                self->reg[dst] += src;
-                
+                self->reg[dst] += src;                
             }break;
             
             case addr:
@@ -130,6 +129,26 @@ internal void execute(struct Computer *self)
                 {
                     next(self);
                 }
+            }break;
+
+            case jmpx:
+            {
+                next(self);
+                static i32 num = 0;
+                i32 addr = fetch(self);
+
+                next(self);
+                i32 times = fetch(self);
+                if(num < times)
+                {
+                    num ++;
+                    self->reg[ip] = addr;
+                }
+                else
+                {
+                    next(self);
+                }
+
             }break;
             
             default:

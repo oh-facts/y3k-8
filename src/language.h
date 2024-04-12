@@ -29,6 +29,7 @@ enum opcode_type
     addv,
     addr,
     jmp,
+    jmpx,
     opcode_num
 };
 
