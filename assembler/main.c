@@ -1,31 +1,16 @@
-#include "common.h"
+#include <y3k8.h>
 
+#include <str_enums.h>
 
-//todo(facts): make a str_enums.h and include just that.
-// meta
-#include "meta/str_enum_device_logger_state.h"
-#include "meta/str_enum_device_state.h"
-#include "meta/str_enum_device_type.h"
-#include "meta/str_enum_NODE_TYPE.h"
-#include "meta/str_enum_opcode_type.h"
-#include "meta/str_enum_register_type.h"
-#include "meta/str_enum_token_type.h"
-//
-
-// ---
-#include "meta.h"
-#include "computer.h"
-#include "computer.c"
+#include "types.h"
 #include "assembler.c"
-#include "platform.c"
-
-
-
+#include "lexer.c"
+#include "parser.c"
 
 
 int main(int argc, char *argv[])
 {
-    AssertM(argc == 2, "Usage: ./out \"filename\" ");
+    AssertM(argc == 3, "Usage: ./out \"input filename\" \"output filename\" ");
     printl("beep boop beep");
     
     printl("%s\n",argv[1]);
@@ -43,6 +28,11 @@ int main(int argc, char *argv[])
     
     u8* bin = assemble(&parser, &arena);
     
+    if(!writeFile(argv[2], bin,100))
+    {
+        printf("Failed to output binary %s", argv[2]);
+    }
+/*
     struct Computer comp = {0};
     comp.ram = bin;
     
@@ -53,5 +43,5 @@ int main(int argc, char *argv[])
     printn();
     printn();
     printf("exited\n");
-    
+*/  
 }

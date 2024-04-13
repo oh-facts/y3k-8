@@ -58,32 +58,24 @@ internal u8 *yk_read_binary_file(const char *filename, struct Arena *arena)
     return buffer;
 }
 
-internal b32 yk_write_to_file(const char* filename, char* data)
-{
-    FILE* file;
-    fopen_s(&file, filename, "wb");
-    
-    // create file if it doesn't exist
-    if(!file)
-    {
-        printl("File [%s] does not exist. Creating ..",filename);
-        fopen_s(&file, filename, "wb+");
-        if(!file)
-        {
-            printl("Could not create file");
-            return false;
-        }
+int writeFile(const char *filePath, const uint8_t *data, size_t dataSize) {
+    // Open the file for writing in binary mode
+    FILE *file = fopen(filePath, "wb");
+    if (file == NULL) {
+        perror("Error opening file");
+        return 0; // Return error code if file cannot be opened
     }
 
-    size_t len = fwrite(data,sizeof(u8),strlen(data),file);
-
-    if(len!=strlen(data))
-    {
-        printl("Writing was interrupted for file %s", filename);
-        fclose(file);
-        return false;
+    // Write data to the file
+    size_t bytesWritten = fwrite(data, sizeof(uint8_t), dataSize, file);
+    if (bytesWritten != dataSize) {
+        perror("Error writing to file");
+        fclose(file); // Close the file before returning
+        return 0; // Return error code if write operation fails
     }
 
+    // Close the file
     fclose(file);
-    return true;
+
+    return 1; // Return success
 }

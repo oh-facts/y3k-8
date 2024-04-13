@@ -1,8 +1,8 @@
 #include <string.h>
 
-#include "common.h"
-#include "platform.c"
-#include "yk_string.h"
+#include <common.h>
+#include <platform.c>
+#include <yk_string.h>
 
 // todo
 // will require people testing it to come up with a good api.
