@@ -28,20 +28,9 @@ int main(int argc, char *argv[])
     
     u8* bin = assemble(&parser, &arena);
     
-    if(!writeFile(argv[2], bin,100))
+    if(!yk_write_binary_file(argv[2], bin,100))
     {
         printf("Failed to output binary %s", argv[2]);
     }
-/*
-    struct Computer comp = {0};
-    comp.ram = bin;
-    
-    execute(&comp);
-    
-    //print_registers(&comp);
-    
-    printn();
-    printn();
-    printf("exited\n");
-*/  
+
 }

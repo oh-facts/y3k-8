@@ -58,24 +58,16 @@ internal u8 *yk_read_binary_file(const char *filename, struct Arena *arena)
     return buffer;
 }
 
-int writeFile(const char *filePath, const uint8_t *data, size_t dataSize) {
-    // Open the file for writing in binary mode
-    FILE *file = fopen(filePath, "wb");
-    if (file == NULL) {
-        perror("Error opening file");
-        return 0; // Return error code if file cannot be opened
-    }
+b32 yk_write_binary_file(const char *filepath, const u8 *data, size_t size) 
+{    
+    FILE *file;
+    fopen_s(&file,filepath, "wb");
+    AssertM(file,"Error opening file");
 
-    // Write data to the file
-    size_t bytesWritten = fwrite(data, sizeof(uint8_t), dataSize, file);
-    if (bytesWritten != dataSize) {
-        perror("Error writing to file");
-        fclose(file); // Close the file before returning
-        return 0; // Return error code if write operation fails
-    }
-
-    // Close the file
+    size_t bytes = fwrite(data, sizeof(u8), size, file);
+    AssertM(bytes == size, "error writing to file %s", filepath);
+    
     fclose(file);
 
-    return 1; // Return success
+    return 1;
 }

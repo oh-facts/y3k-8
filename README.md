@@ -51,6 +51,8 @@ When you run the emulator, you will see the binary's output and the register val
 
 ## Contributing
 
-Open an issue before you choose to work on it because it is possible I am aware / working on it. This isn't needed if we already spoke elsewhere. (however, when doing a pr, explain the thing).
+Open an issue before you choose to work on it because it is possible I am aware / working on it. This isn't needed if we already spoke elsewhere. (however, when doing a pr, explain the thing for documentation's sake).
+
+I don't like build systems so I don't use them. I have bat scripts in my root directory to automate things that mean to me but I gitignore them. Feel free to do the same with shell/make/ninja/cmake if you prefer.
 
 Check `STYLE.md` for the style guide

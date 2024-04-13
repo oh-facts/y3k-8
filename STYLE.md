@@ -80,6 +80,8 @@ https://www.kernel.org/doc/html/v4.10/process/coding-style.html#spaces
 ### misc
 - zero is initialization (ZII)
 - Only headers inside `include` and `gen` are allowed to be included with < >. Everything else uses " " and only references code inside of its root project.
-- mark all functions with internal and all globals with global and all local static vars with local_persist
+- mark all functions with internal linkage as internal and all globals with global and all local static vars with local_persist
+- avoid header gaurds unless they make sense. Single translation unit build so they are unrequired.
 - code is organized between files based on functionality, not struct names.
 - avoid const
+- use fopen_s / xxx_s equivalents to stop stupid fucking microsoft compilers from crying.
