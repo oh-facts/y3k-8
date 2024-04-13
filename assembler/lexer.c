@@ -18,7 +18,6 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     const u32 max_tokens = 1024;
 
     lexi->tokens = push_array(arena, struct token, max_tokens);
-    char* end = data;
     
     // Need a better name for this
     // my award winning language will have aliasing
@@ -72,12 +71,11 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 // if it starts with a number, its always a literal
                 if(is_digit(*current))
                 {
-                    //ToDo(facts): hexadecimal support. check for 0x
-                    new_token.type = tk_lit;
-                    
                     char* peek = current;
+
+                    new_token.type = tk_lit;
                     i32 len = 0;
-                    
+
                     while(true)
                     {
                         new_token.lexeme[len] = *peek;
@@ -85,14 +83,22 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                         
                         if(!is_digit(*(++peek)))
                         {
-                            break;
+                            if(*peek == 'x' && *is_num((peek + 1)))
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                break;
+                            }
                         }
                     }
+                                       
                     lexi->num_tokens++;
-                    
-                    
                     //printf("%d\n",num);
+                    
                     current += len;
+                    
                 }
                 
                 // either a register or opcode or an identifier
