@@ -1,12 +1,41 @@
-#include <y3k8.h>
-
+#include <common.h>
+#include <platform.h>
+#include <yk_string.h>
 // todo
 // will require people testing it to come up with a good api.
 
 // I think I have fixed all edge cases?
 // Only need to clean it up and abuse file writing lesser
 
+// Another meta tool I need.
+// I write down enums inside of a .facts file
+// then I can generate them insde another enum
+// something like
+/*
+@type
+enum alpha
+{
+    a,b,c,d
+};
 
+@type
+enum num
+{
+    25,68,39
+};
+
+@expand
+enum alpha_fruit_num
+{
+    @alpha, apple, orange, (n)_@num
+}
+
+// generated code
+enum alpha_fruit_num
+{
+    a,b,c,d,apple,orange, n_25, n_68, n_39
+}
+*/
 struct token
 {
     char* lexeme;

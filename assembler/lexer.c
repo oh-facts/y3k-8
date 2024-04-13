@@ -15,17 +15,17 @@ internal void print_tokens(struct lexer* lexi)
 
 internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
 {
-    //todo(facts): fix me
     const u32 max_tokens = 1024;
-    
+
     lexi->tokens = push_array(arena, struct token, max_tokens);
     char* end = data;
     
     // Need a better name for this
+    // my award winning language will have aliasing
 #define new_token lexi->tokens[lexi->num_tokens] 
     
-    char* current = &data[0];
-    
+    char* current = data;
+
     while(*current != '\0')
     {
         
@@ -44,6 +44,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
             {
                 new_token.type = tk_colon;
                 new_token.lexeme[0] = ':';
+
                 current ++;
                 lexi->num_tokens++;
             }break;
@@ -64,7 +65,6 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
             case '\n':
             case ' ':
             {
-                
                 current++;
             }break;
             default:
@@ -95,7 +95,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     current += len;
                 }
                 
-                // either a keyword or an identifier
+                // either a register or opcode or an identifier
                 else if(is_alpha(*current))
                 {
                     char* peek = current;
@@ -114,23 +114,28 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     {
                         i32 reg_num = CHAR_TO_INT(new_token.lexeme[1]);
                         new_token.type = reg_num + token_type_reg_offset;
-                        goto found;
                     }
-                    
-                    // is opcode?
-                    for(i32 i = movv; i <opcode_num; i ++)
+                    else
                     {
-                        if(strcmp(new_token.lexeme,str_enum_opcode_type[i]) == 0)
+                         // is opcode?
+                        b32 is_opcode = false;
+                        for(i32 i = movv; i <opcode_num; i ++)
                         {
-                            new_token.type = token_type_op_offset + i;
-                            goto found;
+                            if(strcmp(new_token.lexeme,str_enum_opcode_type[i]) == 0)
+                            {
+                                new_token.type = token_type_op_offset + i;
+                                is_opcode = true;
+                                break;
+                            }
+                        }
+                        
+                        // is identifier!
+                        if(!is_opcode)
+                        {
+                            new_token.type = tk_iden;
                         }
                     }
                     
-                    // is identifier!
-                    new_token.type = tk_iden;
-                    
-                    found:
                     lexi->num_tokens ++;
                     current += lexeme_len;
                     
@@ -147,7 +152,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
     }
     
     new_token.type = tk_terminate;
-    new_token.lexeme[0] = 'a';
+    new_token.lexeme[0] = '\0';
     lexi->num_tokens++;
     
     AssertM(lexi->num_tokens <= max_tokens, "too many tokens");

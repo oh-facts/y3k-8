@@ -10,7 +10,6 @@
 int main(int argc, char *argv[])
 {
     AssertM(argc == 3, "Usage: ./out \"input filename\" \"output filename\" ");
-    printl("beep boop beep");
     
     printl("%s\n",argv[1]);
     
