@@ -1,6 +1,5 @@
 #include <y3k8.h>
-
-#include <str_enums.h>
+#include <gen/str_enums.h>
 
 #include "types.h"
 #include "assembler.c"

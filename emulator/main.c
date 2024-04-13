@@ -1,6 +1,6 @@
 #include <y3k8.h>
+#include <gen/str_enums.h>
 
-#include <str_enums.h>
 #include "computer.c"
 
 int main(int argc, char *argv[])

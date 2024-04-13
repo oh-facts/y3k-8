@@ -11,26 +11,24 @@ I will eventually make a custom C like language for the emulator, then make an O
 
 ## Compiling
 
-The source code is divided between 5 root folders (projects)
+The source code is divided between 4 root folders (projects)
 
-`assembler/`: Assembler code goes here.
-`include/`  : Shared header libraries goes here
-`emulator/` : Emulator code goes here
-`gen/`      : generated code goes here
+1. `assembler/`: Assembler code goes here.
+2. `include/`  : Shared header libraries goes here
+3. `emulator/` : Emulator code goes here
+4. `meta/`     : metaprogrammer code goes here (dev tool, only needed if you're contributing)
 
-`meta/`     : metaprogrammer code goes here (dev tool, only needed if you're contributing)
-
-Source files        : `main.c` inside whichever project you want
-Include directories : `include/` and `gen/`
+- Source files        : `main.c` inside whichever project you want
+- Include directories : `include/`
 
 For example, I use clang on windows, so I do this:
 
 ```
 // Compiles assembler
-clang -I./include -I./gen -o bin/assm.exe assembler/main.c
+clang -I./include -o bin/assm.exe assembler/main.c
 
 // Compiles emulator
-clang -I./include -I./gen -o bin/emu.exe emulator/main.c
+clang -I./include -o bin/emu.exe emulator/main.c
 ```
 
 I usually pass `-g` so I can have debug symbols. Pass whatever you want.

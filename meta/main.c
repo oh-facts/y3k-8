@@ -1,8 +1,4 @@
-#include <string.h>
-
-#include <common.h>
-#include <platform.c>
-#include <yk_string.h>
+#include <y3k8.h>
 
 // todo
 // will require people testing it to come up with a good api.
@@ -174,7 +170,7 @@ void extract(char* data, struct Arena* arena)
                     // But this will have to do for now.
 
                     FILE *file;
-                    char file_name[] = "../src/meta/str_enum_";
+                    char file_name[] = "../include/gen/str_enum_";
                     char ext[] = ".h";
                     
                     strcat_s(file_name, 256 ,name);
@@ -212,8 +208,8 @@ int main(int argc, char* argv[])
 
     char* files[] = 
     {
-        "../src/assembler.c",
-        "../src/computer.h",
+        "../assembler/types.h",
+        "../include/computer.h"
     };
 
     for(i32 i = 0; i < 2; i ++)
