@@ -57,7 +57,7 @@ https://www.kernel.org/doc/html/v4.10/process/coding-style.html#spaces
 - functions are as long as need be. Use local blocks { } and write //comments above it to hold blocks of text that you want to semanticaly divide. Make a function only if you find yourself writing the same code. Or if its an easier representation (consider local macros for this. My award winning language will have proper aliases). 
 
 ### 7
-- avoid goto. Sometimes they are needed for elegant quitting. But are avoidable in 99% of cases. I use them inside the lexer. That is an example of easily avoidable goto. I am lazy. This is bad and I will fix it.
+- avoid goto. Sometimes they are needed for elegant quitting. But are avoidable in 99% of cases.
 
 ### 8
 - if I can tell what your code is doing by skimming at names of variables / functions its calling, it is appropriately commented. If not, put in the bare minimum to fill in those gaps.
