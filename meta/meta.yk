@@ -1,0 +1,11 @@
+@type
+enum alpha
+{
+    a,b,c,d
+};
+
+@type
+enum num
+{
+    25,68,39
+};

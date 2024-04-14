@@ -1,4 +1,8 @@
-#include <y3k8.h>
+#include <meta.h>
+#define YK_PLATFORM
+#include <common.h>
+#include <computer.h>
+
 #include <gen/str_enums.h>
 
 #include "computer.c"

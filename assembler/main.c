@@ -1,7 +1,11 @@
-#include <y3k8.h>
+#include <meta.h>
+#define YK_PLATFORM
+#include <common.h>
+#include <computer.h>
+
 #include <gen/str_enums.h>
 
-#include "types.h"
+#include "assembler.h"
 #include "assembler.c"
 #include "lexer.c"
 #include "parser.c"

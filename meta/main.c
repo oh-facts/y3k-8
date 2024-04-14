@@ -1,6 +1,8 @@
+#define YK_PLATFORM
 #include <common.h>
-#include <platform.h>
-#include <yk_string.h>
+
+#include "lexer.h"
+
 // todo
 // will require people testing it to come up with a good api.
 
@@ -36,57 +38,41 @@ enum alpha_fruit_num
     a,b,c,d,apple,orange, n_25, n_68, n_39
 }
 */
-struct token
-{
-    char* lexeme;
-};
 
-struct output_enum_string
+char* get_dir_up(char* filename ,struct Arena* arena)
 {
-    // big chunk of whole thing separated with commas
-    char* string;
+    char* out = 0;
+    u32 len = strlen(filename);
+    out = push_array(arena,char,len);
+    strcpy(out,filename);
     
-    char* enum_name;
-};
-
-b32 match_word(char* start, const char* match, u32 size)
-{
-    if(memcmp(start, match, size) == 0)
+    for(i32 i = len - 1; i >= 0; i --)
     {
-        return true;
-    }
-    
-    return false;
-}
-
-b32 is_white_space(char* curr)
-{
-    if(*curr == ' ' || *curr == '\n' || *curr == '\t')
-    {
-        return true;
-    }
-    else
-    {
-        return false;
-    }
-}
-
-char* skip_comments(char* curr)
-{
-    if(*curr == '/' && *(curr + 1) == '/' )
-    {
-        while(*(++curr) != '\n')
+        if(out[i] != '/')
         {
-            
+            out[i] = ' ';
         }
-        
+        else
+        {
+            out[i] = '\0';
+            arena->used -= (i - 1);
+            break;
+        }
     }
-    
-    return curr;
+
+    // i32* test = push_array(arena,i32,100);
+    // memset(test,25,100 * sizeof(i32));
+    printf("%s",out);
+
+    return out;
 }
 
-#define enum_gen "gen_string_from_enum"
-u32 enum_gen_size = strlen(enum_gen);
+global const char* files[] = 
+{
+    "../assembler/assembler.h",
+    "../include/computer.h",
+    "../meta/lexer.h",
+};
 
 void extract(char* data, struct Arena* arena)
 {
@@ -104,6 +90,8 @@ void extract(char* data, struct Arena* arena)
         {
             if(match_word(curr, enum_gen, enum_gen_size ))
             {
+                // once you're inside here, you should lex normally
+                // and receive a list of tokens
                 // verify
                 curr += enum_gen_size;
                 
@@ -197,13 +185,22 @@ void extract(char* data, struct Arena* arena)
 
                     // I hate how I am writing so many times instead of one write.
                     // But this will have to do for now.
-
-                    FILE *file;
-                    char file_name[] = "../include/gen/str_enum_";
-                    char ext[] = ".h";
+                    local_persist u32 index;
                     
-                    strcat_s(file_name, 256 ,name);
-                    strcat_s(file_name, 256 ,ext);
+                    // you insane pyscopath. use a [256] buffer for filename. and store
+                    // get_dir_up separately.
+                    FILE *file;
+                    char *file_name = get_dir_up(files[index],arena);
+                    char suffix[] = "/gen/";
+
+                    strcat_s(file_name, strlen(suffix) + strlen(file_name) + 1, suffix);// files[index];
+                    
+                    strcat_s(file_name, strlen(files[index]) + strlen(file_name) + 1, files[index]);// files[index];
+                    
+                    
+                    char ext[] = ".h";
+                    strcat_s(file_name, strlen(ext) + strlen(file_name) + 1, ext);// files[index];
+                    
 
                     fopen_s(&file, file_name, "w+");
 
@@ -221,7 +218,7 @@ void extract(char* data, struct Arena* arena)
 
                     fclose(file);
                 
-                    
+                    index ++;
 
   
                 }
@@ -235,13 +232,11 @@ int main(int argc, char* argv[])
     struct Arena arena;
     arena_innit(&arena, Megabytes(1), calloc(Megabytes(1),sizeof(u8)));
 
-    char* files[] = 
-    {
-        "../assembler/types.h",
-        "../include/computer.h"
-    };
+    //get_dir_up(files[0],&arena);
 
-    for(i32 i = 0; i < 2; i ++)
+    //Assert(4 > 10);
+
+    for(i32 i = 0; i < 3; i ++)
     {
         char* data = yk_read_text_file(files[i], &arena);
         extract(data,&arena);
