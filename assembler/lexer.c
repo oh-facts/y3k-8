@@ -83,7 +83,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                         
                         if(!is_digit(*(++peek)))
                         {
-                            if(*peek == 'x' && *is_num((peek + 1)))
+                            if(*peek == 'x' && is_digit(*(peek + 1)))
                             {
                                 continue;
                             }
