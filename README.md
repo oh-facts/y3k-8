@@ -1,9 +1,9 @@
 # Y3k-8 
 ### v0.0.2 alpha
 
-Name is placeholder. This is an 8 bit emulator. All programs will be made in my own assembly. It will probably borrow ideas from assembly and other emulators I have seen. 
+Name is placeholder. This is an 8 bit emulator. All programs will be made in my own assembly. It will probably borrow ideas from assembly and other emulators I have seen.
 
-Atm I am working on working on adding conditionals
+Atm I am working on working on making the metaprogrammer more efficent. I also need it to do more things for me, so I will work on that next.
 
 I will eventually make a custom C like language for the emulator, then make an OS with it.
 
@@ -41,7 +41,7 @@ Now, that you have the compiled binary, do this,
 
 `./bin/emu.exe "xxx.bin"`
 
-Check the docs and `tests/` to look at the assembly instructions that are currently supported.
+Check the `docs/spec` and `tests/` to look at the assembly instructions that are currently supported.
 
 When you compile an asm file, you will see the lexer and parser output.
 
@@ -51,6 +51,6 @@ When you run the emulator, you will see the binary's output and the register val
 
 Open an issue before you choose to work on it because it is possible I am aware / working on it. This isn't needed if we already spoke elsewhere. (however, when doing a pr, explain the thing for documentation's sake).
 
-I don't like build systems so I don't use them. I have bat scripts in my root directory to automate things that mean to me but I gitignore them. Feel free to do the same with shell/make/ninja/cmake if you prefer.
+I denounce all build systems. They are all rubbish and I refuse to use them. I have bat scripts in my root directory to automate tasks that hold meaning to me but I gitignore them. Feel free to do the same with any shell/make/ninja/cmake/etc that you make.
 
 Check `STYLE.md` for the style guide
