@@ -91,7 +91,7 @@ struct RegNode
 
 struct LabelDeclNode
 {
-    u8 temp;
+    u8 id;
 };
 
 struct LabelNode

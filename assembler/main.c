@@ -12,6 +12,8 @@
 
 #include <yk_file.h>
 
+// todo(facts): Stick to some coding convention (not doing)
+
 int main(int argc, char *argv[])
 {
     struct platform pf = {0};

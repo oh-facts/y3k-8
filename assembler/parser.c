@@ -5,6 +5,8 @@ struct parser
     
     struct Node* first;
     struct token* tokens;
+
+    u32 num_labels;
 };
 
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look
@@ -230,7 +232,9 @@ internal struct Node* make_label_decl_node(struct parser* parser, struct Arena* 
     struct Node* out = push_struct(arena, struct Node);
     out->type = NODE_LABEL_DECL;
     out->token = *parser->tokens;
-    out->label_decl_node.temp = 1;
+    
+    out->label_decl_node.id = parser->num_labels;
+    parser->num_labels++;
 
     // self and colon
     parser->tokens +=2;

@@ -1,5 +1,3 @@
-// todo(facts): Stick to some coding convention (not doing)
-
 #define BIN_MAX_SIZE 1000
 
 // todo(facts): make a memory layout.
@@ -10,6 +8,9 @@ u8* assemble(struct Node* node, struct assembler* ass)
     u32 bindex = 0;
     
     node = node->next;
+
+    u32 labels[10] = {0};
+
     while(node)
     {
         
@@ -37,18 +38,18 @@ u8* assemble(struct Node* node, struct assembler* ass)
 
             case NODE_LABEL_DECL:
             {
-                bin[80] = bindex; 
+                labels[node->label_decl_node.id] = bindex;
             }break;
 
             case NODE_INSTR_L:
             {
                 bin[bindex++] = node->instr_node_l.opcode->op_node.type;
-                bin[bindex++] = bin[80];
+                bin[bindex++] = labels[node->instr_node_l.label->label_node.origin->label_decl_node.id];
             }break;
             case NODE_INSTR_LL:
             {
                 bin[bindex++] = node->instr_node_ll.opcode->op_node.type;
-                bin[bindex++] = bin[80];
+                bin[bindex++] = labels[node->instr_node_l.label->label_node.origin->label_decl_node.id];
                 bin[bindex] = node->instr_node_ll.lit->lit_node.num;
             }break;
             default:
