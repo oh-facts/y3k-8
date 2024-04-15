@@ -1,4 +1,3 @@
-
 gen_string_from_enum
 enum token_type 
 {  
@@ -40,19 +39,12 @@ typedef enum token_type token_type;
 #define token_type_op_offset (tk_movv - 1)
 #define token_type_reg_offset (tk_r1 - 1)
 
-
 // todo(facts): store row# and col#
 // make a str library to use arbitrarily sized strings
 struct token
 {
     token_type type;
     char lexeme[5];
-};
-
-struct lexer
-{
-    struct token* tokens;
-    u32 num_tokens;
 };
 
 gen_string_from_enum
@@ -144,13 +136,4 @@ struct Node
         struct RegNode reg_node;
         struct LabelNode label_node;
     };
-};
-
-struct parser
-{
-    struct Node* memory;
-    u32 num_nodes;
-    
-    struct Node* first;
-    struct token* tokens;
 };

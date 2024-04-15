@@ -1,3 +1,9 @@
+struct lexer
+{
+    struct token* tokens;
+    u32 num_tokens;
+};
+
 internal void print_tokens(struct lexer* lexi)
 {
     printn();
@@ -13,15 +19,16 @@ internal void print_tokens(struct lexer* lexi)
     printn();
 }
 
-internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
+internal struct token* lex_tokens(char* data,  struct Arena* arena)
 {
+    struct lexer lexi = {0};
     const u32 max_tokens = 1024;
 
-    lexi->tokens = push_array(arena, struct token, max_tokens);
+    lexi.tokens = push_array(arena, struct token, max_tokens);
     
     // Need a better name for this
     // my award winning language will have aliasing
-#define new_token lexi->tokens[lexi->num_tokens] 
+#define new_token lexi.tokens[lexi.num_tokens] 
     
     char* current = data;
 
@@ -36,7 +43,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 new_token.lexeme[0] = ',';
                 
                 current ++; 
-                lexi->num_tokens++;
+                lexi.num_tokens++;
                 
             }break;
             case ':':
@@ -45,7 +52,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 new_token.lexeme[0] = ':';
 
                 current ++;
-                lexi->num_tokens++;
+                lexi.num_tokens++;
             }break;
             
             // skip comments until it finds a new line
@@ -94,7 +101,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                         }
                     }
                                        
-                    lexi->num_tokens++;
+                    lexi.num_tokens++;
                     //printf("%d\n",num);
                     
                     current += len;
@@ -125,7 +132,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                     {
                          // is opcode?
                         b32 is_opcode = false;
-                        for(i32 i = movv; i <opcode_num; i ++)
+                        for(i32 i = movv; i < opcode_num; i ++)
                         {
                             if(strcmp(new_token.lexeme,str_enum_opcode_type[i]) == 0)
                             {
@@ -142,7 +149,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                         }
                     }
                     
-                    lexi->num_tokens ++;
+                    lexi.num_tokens ++;
                     current += lexeme_len;
                     
                 }
@@ -152,19 +159,17 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
                 }
                 
             }break;
-            
-            
+                        
         }
     }
     
     new_token.type = tk_terminate;
     new_token.lexeme[0] = '\0';
-    lexi->num_tokens++;
+    lexi.num_tokens++;
     
-    AssertM(lexi->num_tokens <= max_tokens, "too many tokens");
+    AssertM(lexi.num_tokens <= max_tokens, "too many tokens");
     
-    print_tokens(lexi);
+    print_tokens(&lexi);
+
+    return lexi.tokens;
 }
-
-
-

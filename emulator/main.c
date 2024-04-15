@@ -1,7 +1,12 @@
-#include <y3k8.h>
+#include <platform.h>
+
+#include <meta.h>
 #include <gen/str_enums.h>
 
+#include <computer.h>
 #include "computer.c"
+
+#include <yk_file.h>
 
 int main(int argc, char *argv[])
 {

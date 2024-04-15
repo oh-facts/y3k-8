@@ -1,3 +1,12 @@
+struct parser
+{
+    struct Node* memory;
+    u32 num_nodes;
+    
+    struct Node* first;
+    struct token* tokens;
+};
+
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look
 // better
 
@@ -228,41 +237,43 @@ internal struct Node* make_label_decl_node(struct parser* parser, struct Arena* 
     return out;
 }
 
-internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Arena* arena)
+internal struct Node* parse_tokens(struct token* tokens, struct Arena* arena)
 {
-    parser->memory = push_array(arena, struct Node, 1024);
-    parser->first  = &parser->memory[0];
-    parser->tokens = lexi->tokens;
+    struct parser parser = {0};
+
+    parser.memory = push_array(arena, struct Node, 1024);
+    parser.first  = &parser.memory[0];
+    parser.tokens = tokens;
     
-    struct Node* curr = parser->first; 
-    while(parser->tokens->type != tk_terminate)
+    struct Node* curr = parser.first; 
+    while(parser.tokens->type != tk_terminate)
     {
-        switch (parser->tokens->type)
+        switch (parser.tokens->type)
         {
             case tk_movv:
             case tk_addv:
             {
-                curr->next = make_instr_rv(parser,arena);
+                curr->next = make_instr_rv(&parser,arena);
             }break;
             case tk_movr:
             case tk_addr:
             case tk_use:
             {
-                curr->next = make_instr_rr(parser,arena);
+                curr->next = make_instr_rr(&parser,arena);
             }break;
             case tk_jmpx:
             {
-                curr->next = make_instr_ll(parser, arena);
+                curr->next = make_instr_ll(&parser, arena);
             }break;
             case tk_jmp:
             {
-                curr->next = make_instr_l(parser, arena);
+                curr->next = make_instr_l(&parser, arena);
             }break;
             case tk_iden:
             {
-                if((parser->tokens + 1)->type == tk_colon)
+                if((parser.tokens + 1)->type == tk_colon)
                 {
-                    curr->next = make_label_decl_node(parser,arena);
+                    curr->next = make_label_decl_node(&parser,arena);
                 }
             }break;
             default:
@@ -274,6 +285,7 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
         curr = curr->next;
     }    
     
-    print_nodes(parser);
+    print_nodes(&parser);
     
+    return parser.first;
 }
