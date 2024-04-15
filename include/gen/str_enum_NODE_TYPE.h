@@ -2,7 +2,7 @@
 
 global const char* str_enum_NODE_TYPE[] =
 {
-	"NODE_INVALID",
+	"NODE_DUMMY",
 	"NODE_INSTR_RR",
 	"NODE_INSTR_RV",
 	"NODE_INSTR_L",

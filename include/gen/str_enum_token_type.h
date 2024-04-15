@@ -2,7 +2,7 @@
 
 global const char* str_enum_token_type[] =
 {
-	"tk_invalid",
+	"tk_dummy",
 	"tk_r1",
 	"tk_r2",
 	"tk_r3",

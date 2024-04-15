@@ -1,5 +1,3 @@
-
-
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look
 // better
 
@@ -7,10 +5,7 @@ internal void print_node(struct Node* node)
 {
     switch(node->type)
     {
-        case NODE_INVALID:
-        {
-            printl("invalid node");
-        }break;
+
         case NODE_INSTR_RR:
         case NODE_INSTR_RV:
         {
@@ -69,7 +64,8 @@ internal void print_nodes(struct parser* parser)
     printl("Parser Output");
     printl("---------------");
     
-    struct Node* curr = parser->first;
+    // first node is header
+    struct Node* curr = parser->first->next;
     u32 count = 0;
     while(curr)
     {

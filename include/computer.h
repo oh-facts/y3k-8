@@ -4,7 +4,7 @@
 gen_string_from_enum
 enum register_type
 {
-    invalid_register_type = 0x00,
+    register_dummy,
     r1 = 0x01,
     r2 = 0x02,
     r3 = 0x03,
@@ -23,8 +23,8 @@ typedef enum register_type register_type;
 gen_string_from_enum
 enum opcode_type
 {
-    invalid_op = 0x00,
-    movv,
+    opcode_dummy,
+    movv = 1,
     movr,
     addv,
     addr,

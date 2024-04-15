@@ -2,7 +2,7 @@
 
 global const char* str_enum_opcode_type[] =
 {
-	"invalid_op",
+	"opcode_dummy",
 	"movv",
 	"movr",
 	"addv",

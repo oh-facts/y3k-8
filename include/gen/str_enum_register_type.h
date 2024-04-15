@@ -2,7 +2,7 @@
 
 global const char* str_enum_register_type[] =
 {
-	"invalid_register_type",
+	"register_dummy",
 	"r1",
 	"r2",
 	"r3",

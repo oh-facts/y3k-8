@@ -1,11 +1,10 @@
 
 gen_string_from_enum
 enum token_type 
-{
-    tk_invalid,
-    
+{  
+    tk_dummy,
     // registers
-    tk_r1,
+    tk_r1 = 1,
     tk_r2,
     tk_r3,
     tk_r4,
@@ -43,6 +42,7 @@ typedef enum token_type token_type;
 
 
 // todo(facts): store row# and col#
+// make a str library to use arbitrarily sized strings
 struct token
 {
     token_type type;
@@ -57,11 +57,10 @@ struct lexer
 
 gen_string_from_enum
 enum NODE_TYPE
-{
-    NODE_INVALID,
-    
+{   
+    NODE_DUMMY,
     // statements
-    NODE_INSTR_RR,
+    NODE_INSTR_RR = 1,
     NODE_INSTR_RV,
     NODE_INSTR_L,
     NODE_INSTR_LL,

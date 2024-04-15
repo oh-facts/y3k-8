@@ -24,7 +24,7 @@ int main(int argc, char *argv[])
     struct parser parser = {0};
     parse_tokens(&parser, &lexi, &arena);
     
-    u8* bin = assemble(&parser, &arena);
+    u8* bin = assemble(parser.first, &arena);
     
     if(!yk_write_binary_file(argv[2], bin,100))
     {

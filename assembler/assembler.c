@@ -2,12 +2,11 @@
 
 // todo(facts): Stick to some coding convention (not doing)
 
-u8* assemble(struct parser* parser, struct Arena* arena)
+u8* assemble(struct Node* node, struct Arena* arena)
 {
     u8* bin = push_array(arena, u8, 100);
     u32 bindex = 0;
     
-    struct Node* node = parser->first;
     node = node->next;
     while(node)
     {
