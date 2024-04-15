@@ -1,3 +1,9 @@
+struct assembler
+{
+    struct Arena arena;
+    struct Arena scratch;
+};
+
 gen_string_from_enum
 enum token_type 
 {  

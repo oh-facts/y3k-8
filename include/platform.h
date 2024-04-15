@@ -109,10 +109,11 @@ struct platform
 {
     void* memory;
     void* scratch;
+
     size_t mem_size;
     size_t scratch_size;
 
     char*  (*read_text_file)(const char* filename, struct Arena* arena);
     u8*  (*read_bin_file)(const char* filename, struct Arena* arena);
-    b32* (*write_bin_file)(const char *filepath, const u8 *data, size_t size);
+    b32 (*write_bin_file)(const char *filepath, const u8 *data, size_t size);
 };

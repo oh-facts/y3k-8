@@ -19,12 +19,12 @@ internal void print_tokens(struct lexer* lexi)
     printn();
 }
 
-internal struct token* lex_tokens(char* data,  struct Arena* arena)
+internal struct token* lex_tokens(char* data,  struct assembler* ass)
 {
     struct lexer lexi = {0};
     const u32 max_tokens = 1024;
 
-    lexi.tokens = push_array(arena, struct token, max_tokens);
+    lexi.tokens = push_array(&ass->arena, struct token, max_tokens);
     
     // Need a better name for this
     // my award winning language will have aliasing

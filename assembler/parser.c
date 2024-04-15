@@ -237,11 +237,11 @@ internal struct Node* make_label_decl_node(struct parser* parser, struct Arena* 
     return out;
 }
 
-internal struct Node* parse_tokens(struct token* tokens, struct Arena* arena)
+internal struct Node* parse_tokens(struct token* tokens, struct assembler* ass)
 {
     struct parser parser = {0};
 
-    parser.memory = push_array(arena, struct Node, 1024);
+    parser.memory = push_array(&ass->arena, struct Node, 1024);
     parser.first  = &parser.memory[0];
     parser.tokens = tokens;
     
@@ -253,27 +253,27 @@ internal struct Node* parse_tokens(struct token* tokens, struct Arena* arena)
             case tk_movv:
             case tk_addv:
             {
-                curr->next = make_instr_rv(&parser,arena);
+                curr->next = make_instr_rv(&parser,&ass->arena);
             }break;
             case tk_movr:
             case tk_addr:
             case tk_use:
             {
-                curr->next = make_instr_rr(&parser,arena);
+                curr->next = make_instr_rr(&parser,&ass->arena);
             }break;
             case tk_jmpx:
             {
-                curr->next = make_instr_ll(&parser, arena);
+                curr->next = make_instr_ll(&parser, &ass->arena);
             }break;
             case tk_jmp:
             {
-                curr->next = make_instr_l(&parser, arena);
+                curr->next = make_instr_l(&parser, &ass->arena);
             }break;
             case tk_iden:
             {
                 if((parser.tokens + 1)->type == tk_colon)
                 {
-                    curr->next = make_label_decl_node(&parser,arena);
+                    curr->next = make_label_decl_node(&parser,&ass->arena);
                 }
             }break;
             default:
