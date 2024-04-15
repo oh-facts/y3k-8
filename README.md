@@ -3,7 +3,7 @@
 
 Name is placeholder. This is an 8 bit emulator. All programs will be made in my own assembly. It will probably borrow ideas from assembly and other emulators I have seen. 
 
-Atm I am working on working on adding conditionals
+Atm I am making the metaprogrammer better. I am also doing refactors since the project grew too much in complexity.
 
 I will eventually make a custom C like language for the emulator, then make an OS with it.
 
