@@ -8,12 +8,12 @@
 
 internal inline b32 is_digit(char a)
 {
-    return (a >= '0' && a <= '9');
+  return (a >= '0' && a <= '9');
 }
 
 internal inline b32 is_alpha(char a)
 {
-    return ((a >= 'A' && a <= 'Z') || (a >= 'a' && a <= 'z'));
+  return ((a >= 'A' && a <= 'Z') || (a >= 'a' && a <= 'z'));
 }
 
 #endif

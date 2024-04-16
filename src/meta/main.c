@@ -1,5 +1,10 @@
 #include <base/base_inc.h>
 
+
+// New edge case found
+// if gen_string_from_enum is the first string in the file, it won't detect it
+
+
 // todo
 // will require people testing it to come up with a good api.
 
@@ -200,7 +205,7 @@ void extract(char* data, struct Arena* arena)
           // But this will have to do for now.
           
           FILE *file;
-          char file_name[] = "../include/gen/str_enum_";
+          char file_name[] = "../src/gen/str_enum_";
           char ext[] = ".h";
           
           strcat_s(file_name, 256 ,name);
@@ -238,11 +243,12 @@ int main(int argc, char* argv[])
   
   char* files[] = 
   {
-    "../assembler/types.h",
-    "../include/computer.h"
+    "../src/assembler/parser.h",
+    "../src/assembler/lexer.h",
+    "../src/emulator/computer.h",
   };
   
-  for(i32 i = 0; i < 2; i ++)
+  for(i32 i = 0; i < 3; i ++)
   {
     char* data = yk_read_text_file(files[i], &arena);
     extract(data,&arena);
