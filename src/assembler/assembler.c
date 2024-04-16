@@ -1,4 +1,3 @@
-// lexer, then parser, then assembler
 
 // todo(facts): Stick to some coding convention (not doing)
 

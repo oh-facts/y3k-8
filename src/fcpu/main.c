@@ -2,10 +2,11 @@
 #include <gen/str_enums.h>
 
 #include <emulator/computer.h>
-#include <assembler/types.h>
-#include <assembler/assembler.c>
+#include <assembler/lexer.h>
 #include <assembler/lexer.c>
+#include <assembler/parser.h>
 #include <assembler/parser.c>
+#include <assembler/assembler.c>
 
 #include <emulator/computer.h>
 #include <emulator/computer.c>
