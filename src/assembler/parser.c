@@ -1,5 +1,3 @@
-
-
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look
 // better
 

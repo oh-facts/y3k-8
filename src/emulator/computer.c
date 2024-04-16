@@ -1,5 +1,3 @@
-#include "meta.h"
-
 struct logger
 {
     device_logger_state state;

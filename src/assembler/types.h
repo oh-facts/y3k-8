@@ -1,4 +1,3 @@
-
 gen_string_from_enum
 enum token_type 
 {

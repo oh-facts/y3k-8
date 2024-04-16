@@ -1,6 +1,5 @@
-#include <common.h>
-#include <platform.h>
-#include <yk_string.h>
+#include <base/base_inc.h>
+
 // todo
 // will require people testing it to come up with a good api.
 
