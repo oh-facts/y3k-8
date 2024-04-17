@@ -1,4 +1,5 @@
-
+#ifndef PARSER_H
+#define PARSER_H
 
 gen_string_from_enum
 enum NODE_TYPE
@@ -9,7 +10,6 @@ enum NODE_TYPE
   NODE_INSTR_RR,
   NODE_INSTR_RV,
   NODE_INSTR_L,
-  NODE_INSTR_LL,
   NODE_LABEL_DECL,
   NODE_USE,
   
@@ -63,13 +63,6 @@ struct InstrNodeL
   struct Node* label;
 };
 
-struct InstrNodeLL
-{
-  struct Node* opcode;
-  struct Node* label;
-  struct Node* lit;
-};
-
 struct Node
 {
   struct token token;
@@ -81,7 +74,6 @@ struct Node
     // statements
     struct InstrNode instr_node;
     struct InstrNodeL instr_node_l;
-    struct InstrNodeLL instr_node_ll;
     struct LabelDeclNode label_decl_node;
     
     // types
@@ -107,3 +99,5 @@ struct parser
   struct Node **label_calls;
   u32 num_label_calls;
 };
+
+#endif

@@ -47,10 +47,6 @@ internal void print_node(struct Node* node)
       print_node(node->instr_node_l.label);
       printn();
     }break;
-    case NODE_INSTR_LL:
-    {
-      
-    }break;
     case NODE_LABEL_DECL:
     {
       printl("Label Decl %s", node->token.lexeme);
@@ -208,22 +204,6 @@ internal struct Node *make_instr_l(struct parser* parser, struct Arena* arena)
   return out;
 }
 
-internal struct Node* make_instr_ll(struct parser* parser, struct Arena* arena)
-{
-  struct Node* out = push_struct(arena, struct Node);
-  out->type = NODE_INSTR_LL;
-  out->token = *parser->tokens;
-  
-  out->instr_node_ll.opcode = make_op_node(parser, arena);
-  out->instr_node_ll.label = make_label_node(parser, arena);
-  
-  parser->tokens ++;
-  
-  out->instr_node_ll.lit = make_lit_node(parser, arena);
-  
-  return out;
-}
-
 internal struct Node* make_label_decl_node(struct parser* parser, struct Arena* arena)
 {
   struct Node* out = push_struct(arena, struct Node);
@@ -264,10 +244,6 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
       case tk_use:
       {
         curr->next = make_instr_rr(parser,arena);
-      }break;
-      case tk_jmpx:
-      {
-        curr->next = make_instr_ll(parser, arena);
       }break;
       case tk_jmp:
       {

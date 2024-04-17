@@ -1,4 +1,5 @@
-
+#ifndef LEXER_H
+#define LEXER_H
 
 gen_string_from_enum
 enum token_type 
@@ -21,7 +22,6 @@ enum token_type
   tk_addv,
   tk_addr,
   tk_jmp,
-  tk_jmpx,
   tk_use,
   
   // keywords
@@ -55,3 +55,5 @@ struct lexer
   struct token* tokens;
   u32 num_tokens;
 };
+
+#endif
