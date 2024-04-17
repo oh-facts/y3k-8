@@ -1,6 +1,20 @@
 
 // todo(facts): Stick to some coding convention (not doing)
 
+struct defn
+{
+  u32 id[100];
+  u32 addr[100];
+  u32 num;
+};
+
+struct calls
+{
+  u8 dst[100];
+  u8 src[100];
+  u32 num;
+};
+
 u8* assemble(struct parser* parser, struct Arena* arena)
 {
   u8* bin = push_array(arena, u8, 100);
@@ -9,7 +23,8 @@ u8* assemble(struct parser* parser, struct Arena* arena)
   struct Node* node = parser->first;
   node = node->next;
   
-  u8 labels[100] = {0};
+  struct defn defn = {0};
+  struct calls calls = {0};
   
   while(node)
   {
@@ -38,21 +53,21 @@ u8* assemble(struct parser* parser, struct Arena* arena)
       
       case NODE_LABEL_DECL:
       {
-        labels[node->label_decl_node.id] = bindex;
-        //bin[80] = bindex;
+        defn.id[defn.num] = node->label_decl_node.id;
+        defn.addr[defn.num] = bindex;
+        defn.num++;
       }break;
       
       case NODE_INSTR_L:
       {
         bin[bindex++] = node->instr_node_l.opcode->op_node.type;
-        bin[bindex++] = labels[node->instr_node_l.label->label_node.origin->label_decl_node.id];
+        
+        calls.dst[calls.num] = node->instr_node_l.label->label_node.origin->label_decl_node.id;
+        calls.src[calls.num] = bindex++;
+        
+        calls.num++;
       }break;
-      case NODE_INSTR_LL:
-      {
-        bin[bindex++] = node->instr_node_ll.opcode->op_node.type;
-        bin[bindex++] = bin[80];
-        bin[bindex] = node->instr_node_ll.lit->lit_node.num;
-      }break;
+      
       default:
       {
         INVALID_CODE_PATH();
@@ -62,6 +77,20 @@ u8* assemble(struct parser* parser, struct Arena* arena)
     node = node->next;
     
   }   
+  
+  // linking
+  for(u32 i = 0; i < defn.num; i ++)
+  {
+    for(u32 j = 0; j < calls.num; j ++)
+    {
+      if(calls.dst[j] == defn.id[i])
+      {
+        bin[calls.src[j]] = defn.addr[i]; 
+        break;
+      }
+    }
+    
+  }
   
   return bin;
   

@@ -1,14 +1,14 @@
-; initialize logger
-    movv r5, 1     ; device type
-    movv r6, 0     ; device mode
-    use  r5, r6    ; (device, input)
-
-; 
-
-    movv r1, 0      ; r1 = 0
+		jmp L2
 L1:
-    addv r1, 1      ; r1 += 1
-    use  r5, r1     ; use (device, input)
-    jmp  L2         ; 
+		addv r1, 1
+    jmp  L4
  
-;  haven't added comparisons, so this will have to do it like this
+L2: 
+		movv r2, 2
+		jmp L1
+
+L3:
+		movv r3, 3		;completely skipped
+
+L4: 
+		movv r4, 4
