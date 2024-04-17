@@ -39,7 +39,7 @@ struct RegNode
 
 struct LabelDeclNode
 {
-  u8 temp;
+  u8 id;
 };
 
 struct LabelNode
@@ -73,7 +73,7 @@ struct InstrNodeLL
 struct Node
 {
   struct token token;
-  struct Node* next;
+  struct Node *next;
   
   NODE_TYPE type;
   union
@@ -94,9 +94,16 @@ struct Node
 
 struct parser
 {
-  struct Node* memory;
+  struct token *tokens;
+  
+  struct Node *memory;
+  
+  struct Node *first;
   u32 num_nodes;
   
-  struct Node* first;
-  struct token* tokens;
+  struct Node **label_decls;
+  u32 num_label_decls;
+  
+  struct Node **label_calls;
+  u32 num_label_calls;
 };

@@ -8,6 +8,9 @@ u8* assemble(struct parser* parser, struct Arena* arena)
   
   struct Node* node = parser->first;
   node = node->next;
+  
+  u8 labels[100] = {0};
+  
   while(node)
   {
     
@@ -35,13 +38,14 @@ u8* assemble(struct parser* parser, struct Arena* arena)
       
       case NODE_LABEL_DECL:
       {
-        bin[80] = bindex; 
+        labels[node->label_decl_node.id] = bindex;
+        //bin[80] = bindex;
       }break;
       
       case NODE_INSTR_L:
       {
         bin[bindex++] = node->instr_node_l.opcode->op_node.type;
-        bin[bindex++] = bin[80];
+        bin[bindex++] = labels[node->instr_node_l.label->label_node.origin->label_decl_node.id];
       }break;
       case NODE_INSTR_LL:
       {
