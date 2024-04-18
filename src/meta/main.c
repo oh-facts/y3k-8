@@ -245,17 +245,18 @@ int main(int argc, char* argv[])
   {
     "../src/assembler/parser.h",
     "../src/assembler/lexer.h",
+    "../src/assembler/language.h",
     "../src/emulator/computer.h",
   };
   
-  for(i32 i = 0; i < 3; i ++)
+  for(i32 i = 0; i < 4; i ++)
   {
     char* data = yk_read_text_file(files[i], &arena);
     extract(data,&arena);
     
     arena.used = 0;
     memset(arena.base,0, arena.size);
+    
   }
-  
   return 0;
 }

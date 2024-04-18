@@ -51,19 +51,19 @@ i8 use_device(struct Device* device, i8 in)
 
 struct Computer
 {
-  u8 reg[register_num];
+  u8 reg[rt_num];
   u8 *ram;
   struct Device devices[dt_num];
 };
 
 internal inline u8 fetch(struct Computer *self)
 {
-  return self->ram[self->reg[ip]];
+  return self->ram[self->reg[rt_ip]];
 }
 
 internal inline void next(struct Computer *self)
 {
-  self->reg[ip] ++;
+  self->reg[rt_ip] ++;
 }
 
 internal void execute(struct Computer *self)
@@ -72,7 +72,7 @@ internal void execute(struct Computer *self)
   {
     switch (fetch(self))
     {
-      case movv:
+      case op_movv:
       {
         next(self);
         u8 dst = fetch(self);
@@ -85,7 +85,7 @@ internal void execute(struct Computer *self)
         
       }break;
       
-      case movr:
+      case op_movr:
       {   
         next(self);
         u8 dst = fetch(self);
@@ -98,7 +98,7 @@ internal void execute(struct Computer *self)
         
       }break;
       
-      case addv:
+      case op_addv:
       {
         next(self);
         u8 dst = fetch(self);
@@ -108,7 +108,7 @@ internal void execute(struct Computer *self)
         self->reg[dst] += src;                
       }break;
       
-      case addr:
+      case op_addr:
       {
         next(self);
         u8 dst = fetch(self);
@@ -119,7 +119,7 @@ internal void execute(struct Computer *self)
         
       }break;
       
-      case use:
+      case op_use:
       {
         static struct Device dc = {0};
         next(self);
@@ -133,11 +133,11 @@ internal void execute(struct Computer *self)
         use_device(&dc, self->reg[in]);
       }break;
       
-      case jmp:
+      case op_jmp:
       {
         next(self);
         
-        self->reg[ip] = fetch(self);            
+        self->reg[rt_ip] = fetch(self);            
         
       }break;
       
@@ -152,7 +152,7 @@ internal void print_registers(struct Computer* self)
 {   
   printl("Register View");
   printl("---------------");
-  for(i32 i = r1; i < register_num; i ++)
+  for(i32 i = rt_r1; i < rt_num; i ++)
   {
     printl("%s : 0x%02x", str_enum_register_type[i], self->reg[i]);
     //printl("%s : %d",register_str[i], self->reg[i]);

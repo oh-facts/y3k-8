@@ -39,10 +39,6 @@ enum token_type
 
 typedef enum token_type token_type;
 
-#define token_type_op_offset (tk_movv - 1)
-#define token_type_reg_offset (tk_r1 - 1)
-
-
 // todo(facts): store row# and col#
 struct token
 {

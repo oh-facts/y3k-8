@@ -1,26 +1,24 @@
-#ifndef LANGUAGE_H
-#define LANGUAGE_H
+/* date = April 18th 2024 0:54 pm */
 
-// todo(facts): Make a language enum that holds everything relevant to the language
-// you can put that inside assembler
-// make a computer.h that holds computer related stuff
-// the assemlber can have a backends/fcpu that holds translations to relevant addresses
+#ifndef COMPUTER_H
+#define COMPUTER_H
+
 
 gen_string_from_enum
 enum register_type
 {
   invalid_register_type = 0x00,
-  r1 = 0x01,
-  r2 = 0x02,
-  r3 = 0x03,
-  r4 = 0x04,
-  r5 = 0x05,
-  r6 = 0x06,
-  r7 = 0x07,
-  r8 = 0x08,
-  acc,
-  ip,
-  register_num
+  rt_r1 = 0x01,
+  rt_r2 = 0x02,
+  rt_r3 = 0x03,
+  rt_r4 = 0x04,
+  rt_r5 = 0x05,
+  rt_r6 = 0x06,
+  rt_r7 = 0x07,
+  rt_r8 = 0x08,
+  rt_acc,
+  rt_ip,
+  rt_num
 };
 
 typedef enum register_type register_type;
@@ -29,12 +27,12 @@ gen_string_from_enum
 enum opcode_type
 {
   invalid_op = 0x00,
-  movv,
-  movr,
-  addv,
-  addr,
-  jmp,
-  use,
+  op_movv,
+  op_movr,
+  op_addv,
+  op_addr,
+  op_jmp,
+  op_use,
   opcode_num
 };
 
@@ -68,4 +66,7 @@ enum device_logger_state
 
 typedef enum device_logger_state device_logger_state;
 
-#endif
+
+
+
+#endif //COMPUTER_H

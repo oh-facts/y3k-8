@@ -2,6 +2,7 @@
 #include <gen/str_enums.h>
 
 #include <emulator/computer.h>
+#include <assembler/language.h>
 #include <assembler/lexer.h>
 #include <assembler/lexer.c>
 #include <assembler/parser.h>
