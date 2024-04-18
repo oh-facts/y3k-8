@@ -7,6 +7,7 @@
 gen_string_from_enum
 enum register_type
 {
+  invalid_register_type = 0x00,
   rt_r1 = 0x01,
   rt_r2 = 0x02,
   rt_r3 = 0x03,
@@ -25,7 +26,8 @@ typedef enum register_type register_type;
 gen_string_from_enum
 enum opcode_type
 {
-  op_movv = 0x01,
+  invalid_op = 0x00,
+  op_movv,
   op_movr,
   op_addv,
   op_addr,

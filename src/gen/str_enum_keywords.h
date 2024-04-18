@@ -2,6 +2,7 @@
 
 global const char* str_enum_keywords[] =
 {
+	"ke_inv",
 	"r1",
 	"r2",
 	"r3",
