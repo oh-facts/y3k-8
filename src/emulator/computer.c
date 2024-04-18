@@ -80,6 +80,9 @@ internal void execute(struct Computer *self)
         u8 src = fetch(self);
         next(self);
         self->reg[dst] = src;
+        
+        
+        
       }break;
       
       case op_movr:
@@ -90,6 +93,9 @@ internal void execute(struct Computer *self)
         u8 src = fetch(self);
         next(self);
         self->reg[dst] = self->reg[src];
+        
+        
+        
       }break;
       
       case op_addv:

@@ -13,9 +13,7 @@ L3:
 
 L4: 
 		movv r4, 4
-    jmp L5
 
-L5:
 
 ; comment out stuff and put more jmps.
 ; todo

@@ -19,14 +19,12 @@ enum keywords
   r7,
   r8,
   
-  nop,
   movv,
   movr,
   addv,
   addr,
   jmp,
   use,
-  cmp,
   kw_num,
 };
 

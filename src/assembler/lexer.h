@@ -17,7 +17,6 @@ enum token_type
   tk_r8,
   
   // op
-  tk_nop,
   tk_movv,
   tk_movr,
   tk_addv,

@@ -26,14 +26,13 @@ typedef enum register_type register_type;
 gen_string_from_enum
 enum opcode_type
 {
-  op_nop = 0x00,
+  invalid_op = 0x00,
   op_movv,
   op_movr,
   op_addv,
   op_addr,
   op_jmp,
   op_use,
-  op_cmp,
   opcode_num
 };
 
