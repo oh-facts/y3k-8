@@ -4,10 +4,8 @@
 gen_string_from_enum
 enum token_type 
 {
-  tk_invalid,
-  
   // registers
-  tk_r1,
+  tk_r1 = 1,
   tk_r2,
   tk_r3,
   tk_r4,
