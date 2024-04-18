@@ -11,11 +11,13 @@ global const char* str_enum_keywords[] =
 	"r6",
 	"r7",
 	"r8",
+	"nop",
 	"movv",
 	"movr",
 	"addv",
 	"addr",
 	"jmp",
 	"use",
+	"cmp",
 	"kw_num",
 };

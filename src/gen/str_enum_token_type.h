@@ -11,6 +11,7 @@ global const char* str_enum_token_type[] =
 	"tk_r6",
 	"tk_r7",
 	"tk_r8",
+	"tk_nop",
 	"tk_movv",
 	"tk_movr",
 	"tk_addv",
