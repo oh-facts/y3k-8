@@ -29,9 +29,9 @@ numbers need to be in the decimal system
 
 Very unsure about the api. Will change. Atm, there "are" two loggers.
 
-use a, b
+`use a, b`
 
-a: Register. 1 to print unsigned 8 bit
-             2 to print ascii char
-
-b: Register. Prints whatever value is inside it
+- a: Register.
+ - 1 to print unsigned 8 bit
+ - 2 to print ascii char
+- b: Register. Prints whatever value is inside it
