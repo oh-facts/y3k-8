@@ -1,6 +1,8 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
+#define watch_your_mouth
+
 gen_string_from_enum
 enum keywords
 {
