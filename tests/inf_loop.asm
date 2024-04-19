@@ -1,7 +1,5 @@
-; initialize logger
+; logger stuff
     movv r5, 1     ; device type
-    movv r6, 0     ; device mode
-    use  r5, r6    ; (device, input)
 
 ; 
 

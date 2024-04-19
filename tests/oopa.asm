@@ -1,4 +1,4 @@
-; r1, r2 ... r8 are general purpose registers. I don't remember why there are eight
+; r1, r2 ... r8 are general purpose registers. I don't remember why there are  ; eight
 
 movv r1, 10     ; r1 = 10
 movv r2, 9      ; r2 = 9

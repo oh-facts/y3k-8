@@ -22,6 +22,7 @@ L7:
 L8:
 L9:
 
+; register view: 1,2,0,4,5
 
 ; I put extra labels for fun. I thought not having a nop would crash it if I ;jumped to a label like that
 

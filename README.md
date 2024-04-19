@@ -1,5 +1,5 @@
 # Y3k-8 
-### v0.0.3 alpha
+### v0.0.4 alpha
 
 Name is placeholder. This is an 8 bit emulator. Programs are made in my own assembly.
 
@@ -34,7 +34,7 @@ Check the docs and `tests/` to look at the assembly instructions that are curren
 
 When you compile an asm file, you will see the lexer and parser output.
 
-When you run the emulator, you will see the binary's output and the register values
+When you run the emulator, you will see the binary's output (if its using a logger to print values) and the register values
 
 ## For contributors
 
@@ -43,6 +43,8 @@ When you run the emulator, you will see the binary's output and the register val
 Open an issue before you choose to work on it because it is possible I am aware / working on it. This isn't needed if we already spoke elsewhere. (however, when doing a pr, explain the thing for documentation's sake).
 
 All build systems for C/C++ are inreedemably bad. This project will never use one. I have bat scripts in my root directory to automate things that mean to me but I gitignore them. Feel free to do the same with shell/make/ninja/cmake if you prefer. Add them to the gitignore, or don't track them yourself.
+
+Report bugs if you find them. Work on them if you want to. Make an issue first.
 
 Check `STYLE.md` for the style guide
 
