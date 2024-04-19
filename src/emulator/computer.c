@@ -110,48 +110,53 @@ internal void execute(struct Computer *self)
       case op_movv:
       {
         next(self);
+        
         u8 dst = fetch(self);
         next(self);
+        
         u8 src = fetch(self);
         next(self);
+        
         self->reg[dst] = src;
-        
-        
-        
       }break;
       
       case op_movr:
       {   
         next(self);
+        
         u8 dst = fetch(self);
         next(self);
+        
         u8 src = fetch(self);
         next(self);
+        
         self->reg[dst] = self->reg[src];
-        
-        
-        
       }break;
       
       case op_addv:
       {
         next(self);
+        
         u8 dst = fetch(self);
         next(self);
+        
         u8 src = fetch(self);
         next(self);
+        
         self->reg[dst] += src;                
       }break;
       
       case op_addr:
       {
         next(self);
+        
         u8 dst = fetch(self);
         next(self);
+        
         u8 src = fetch(self);
         next(self);
-        self->reg[dst] += self->reg[src];
         
+        self->reg[dst] += self->reg[src];
       }break;
       //note(facts): I hate this usage. think of better api when you work on devices properly. even i don't remember how it works, i copy paste my old asm
       case op_use:
