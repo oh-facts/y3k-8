@@ -251,6 +251,7 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
       case tk_addr:
       case tk_use:
       case tk_cmp:
+      case tk_icmp:
       {
         curr->next = make_instr_rr(parser,arena);
       }break;

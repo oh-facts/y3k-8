@@ -1,6 +1,6 @@
 ; imagine these were variables
-    movv r6, 1     ; int logger
-    movv r7, 2     ; char logger
+    movv r6, 3     ; uint logger
+    movv r7, 1     ; char logger
     movv r8, 10    ; new line ascii
 
 movv r1, 0

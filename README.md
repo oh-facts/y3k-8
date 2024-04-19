@@ -1,11 +1,9 @@
 # Y3k-8 
-### v0.0.4 alpha
+### v0.0.4b
 
 Name is placeholder. This is an 8 bit emulator. Programs are made in my own assembly.
 
-atm, I am working on the assembler.
-
-I will eventually make a custom C like language for the emulator, then make an OS with it.
+atm, I am working on dev tools
 
 ## Compiling
 
@@ -40,13 +38,11 @@ When you run the emulator, you will see the binary's output (if its using a logg
 
 ### Contributing
 
-Open an issue before you choose to work on it because it is possible I am aware / working on it. This isn't needed if we already spoke elsewhere. (however, when doing a pr, explain the thing for documentation's sake).
+Open an issue for bugs, fixes, features, ideas, abuses, contributions, whatever.
 
-I have bat scripts in my root directory to automate things that hold meaning to me but I gitignore them. Feel free to do the same with shell/make/ninja/cmake if you prefer. Add them to the gitignore if you're using them.
+Look at the issues if you want to do tasks I haven't started.
 
-Report bugs if you find them. Work on them if you want to. Make an issue first.
-
-Check `STYLE.md` for the style guide
+Check `STYLE.md` and `docs/spec.md` to get started
 
 ### Project Structure
 

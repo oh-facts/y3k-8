@@ -10,6 +10,7 @@ global const char* str_enum_opcode_type[] =
 	"op_jmp",
 	"op_use",
 	"op_cmp",
+	"op_icmp",
 	"op_jg",
 	"op_jl",
 	"op_je",

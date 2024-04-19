@@ -86,7 +86,10 @@ u8* assemble(struct parser* parser, struct Arena* arena)
       if(calls.dst[j] == defn.id[i])
       {
         bin[calls.src[j]] = defn.addr[i]; 
-        break;
+        
+        // I added a break here before.
+        // stupid move on my part. It stops from
+        // multiple calls to the same defn
       }
     }
     

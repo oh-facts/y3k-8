@@ -1,4 +1,30 @@
 
+// insanity. need to get rid of this
+#define SET_FLAGS_EQUAL(self, reg1, reg2) \
+if ((reg1) == (reg2)) \
+{\
+(self)->reg[rt_flags] |= ft_zero; \
+}\
+else if ((reg1) < (reg2))\
+{\
+(self)->reg[rt_flags] |= ft_sign; \
+}\
+else\
+{\
+(self)->reg[rt_flags] |= ft_carry; \
+}
+
+#define EXEC_CMP(self, type) \
+self->reg[rt_flags] = 0; \
+next(self); \
+\
+type reg1 = self->reg[fetch(self)]; \
+next(self); \
+type reg2 = self->reg[fetch(self)]; \
+\
+next(self); \
+SET_FLAGS_EQUAL(self, reg1, reg2);
+
 struct Device
 {
   u8 device_slot;
@@ -22,14 +48,19 @@ void use_device(device_type type, i8 in)
       printl("device type not initialized. This is a bug");
     }break;
     
-    case dt_logger_int:
-    {
-      printf("%hhu",in);
-    }break;
-    
     case dt_logger_char:
     {
       printf("%c",in);
+    }break;
+    
+    case dt_logger_int:
+    {
+      printf("%hhd" ,in);
+    }break;
+    
+    case dt_logger_uint:
+    {
+      printf("%hhu",in);
     }break;
     
     default:
@@ -146,36 +177,13 @@ internal void execute(struct Computer *self)
       
       case op_cmp:
       {
-        self->reg[rt_flags] = 0;
-        
-        next(self);
-        
-        u8 reg1 = self->reg[fetch(self)];
-        next(self);
-        
-        u8 reg2 = self->reg[fetch(self)];
-        next(self);
-        
-        // i am one sneaky boy. i hope no one bullies me for this silly
-        i16 diff = (i16)reg1 - reg2;
-        
-#define sign_16 (1 << 15)
-        
-        if(diff == 0)
-        {
-          self->reg[rt_flags] |= ft_zero;
-        }
-        else if(diff & sign_16)
-        {
-          self->reg[rt_flags] |= ft_sign;
-        }
-        else
-        {
-          self->reg[rt_flags] |= ft_carry;
-        }
-        
-        
+        EXEC_CMP(self,u8);
       }break;
+      case op_icmp:
+      {
+        EXEC_CMP(self,i8);
+      }break;
+      
       case op_je:
       {
         exec_jmp_instr(self, ft_zero);
@@ -201,7 +209,7 @@ internal void execute(struct Computer *self)
 
 internal void print_registers(struct Computer* self)
 {   
-  printl("Register View");
+  printl("\n\nRegister View");
   printl("---------------");
   for(i32 i = rt_r1; i < rt_num; i ++)
   {

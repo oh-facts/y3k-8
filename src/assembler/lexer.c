@@ -78,7 +78,7 @@ internal void lex_tokens(char* data, struct lexer* lexi, struct Arena* arena)
       default:
       {
         // if it starts with a number, its always a literal
-        if(is_digit(*current))
+        if(is_digit(*current) || *current == '-')
         {
           char* peek = current;
           

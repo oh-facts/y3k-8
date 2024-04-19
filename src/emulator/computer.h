@@ -46,6 +46,7 @@ enum opcode_type
   op_jmp,
   op_use,
   op_cmp,
+  op_icmp,
   op_jg,
   op_jl,
   op_je,
@@ -58,8 +59,10 @@ gen_string_from_enum
 enum device_type
 {
   dt_invalid,
-  dt_logger_int,
   dt_logger_char,
+  dt_logger_int,
+  dt_logger_uint,
+  
   dt_num
 };
 

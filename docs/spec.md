@@ -1,4 +1,4 @@
-# Instruction set v0.1.0
+# Instruction set v0.2.0
 
 | op   | does             |
 | ---- | ---------------- |
@@ -9,6 +9,7 @@
 | jmp  | IP = L           |
 | use  | check devices    |
 | cmp  | sets S/Z/C to 1  |
+| icmp | sets S/Z/C to 1  |
 | jg   | if(C) { IP = L } |
 | jl   | if(S) { IP = L } |
 | je   | if(Z) { IP = L } |
@@ -31,5 +32,10 @@ Very unsure about the api. Will change. Atm, there "are" two loggers.
 
 `use a, b`
 
-- a: Register. 1 to print unsigned 8 bit. 2 to print ascii char
-- b: Register. Prints whatever value is inside it.
+ - a: Register 
+	 - print codes: 
+		 - char : 1 
+		 - i8   : 2 
+		 - u8   : 3
+ - b: Register 
+	 - Prints whatever value is inside it.

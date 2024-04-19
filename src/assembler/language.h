@@ -21,6 +21,7 @@ enum keywords
   jmp,
   use,
   cmp,
+  icmp,
   jg,
   jl,
   je,

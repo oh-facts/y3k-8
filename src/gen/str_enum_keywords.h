@@ -18,6 +18,7 @@ global const char* str_enum_keywords[] =
 	"jmp",
 	"use",
 	"cmp",
+	"icmp",
 	"jg",
 	"jl",
 	"je",

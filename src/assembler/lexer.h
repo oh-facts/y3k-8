@@ -26,6 +26,7 @@ enum token_type
   tk_jmp,
   tk_use,
   tk_cmp,
+  tk_icmp,
   tk_jg,
   tk_jl,
   tk_je,

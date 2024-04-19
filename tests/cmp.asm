@@ -1,18 +1,38 @@
-movv r1, 1
-movv r2, 2
+; cmp is for unsigned comparision
+; icmp is for signed
 
-cmp r1, r2
-jg L1
-jmp L2
+; imagine these were variables
+movv r3, 1     ; char logger
+movv r4, 2     ; 2 for int, 3 for uint (logger)
+    
+movv r5, 60    ; '<'
+movv r6, 61    ; '='
+movv r7, 62    ; '>'
+    
+movv r8, 32    ; ' '
+ 
+movv r1, 25	 ; the numbers we are comparing
+movv r2, -23   
 
-L1: 
-movv r3, 1
-jmp L3
+use r4, r1
+use r3, r8
 
-L2:
-movv r4, 1
+icmp r1, r2
+jl less
 
-L3:
+icmp r1, r2
+jg more
 
-; if r1 > r2, then r3 = 1
-; otherwise r4 = 1
+use r3, r6
+jmp end
+
+less:
+use r3, r5    ; print '<'
+jmp end
+
+more:
+use r3, r7
+
+end:
+use r3, r8    ; print '\n'
+use r4, r2
