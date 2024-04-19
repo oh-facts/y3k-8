@@ -56,14 +56,27 @@ struct Computer
   struct Device devices[dt_num];
 };
 
-internal inline u8 fetch(struct Computer *self)
+internal u8 fetch(struct Computer *self)
 {
   return self->ram[self->reg[rt_ip]];
 }
 
-internal inline void next(struct Computer *self)
+internal void next(struct Computer *self)
 {
   self->reg[rt_ip] ++;
+}
+
+internal void exec_jmp_instr(struct Computer *self, flag_type flag)
+{
+  next(self);
+  if(self->reg[rt_flags] & flag)
+  {
+    self->reg[rt_ip] = fetch(self);
+  }
+  else
+  {
+    next(self);
+  }
 }
 
 internal void execute(struct Computer *self)
@@ -118,7 +131,7 @@ internal void execute(struct Computer *self)
         self->reg[dst] += self->reg[src];
         
       }break;
-      
+      //note(facts): I hate this usage. think of better api when you work on devices properly. even i don't remember how it works, i copy paste my old asm
       case op_use:
       {
         static struct Device dc = {0};
@@ -140,6 +153,54 @@ internal void execute(struct Computer *self)
         self->reg[rt_ip] = fetch(self);            
         
       }break;
+      
+      case op_cmp:
+      {
+        self->reg[rt_flags] = 0;
+        
+        next(self);
+        
+        u8 reg1 = self->reg[fetch(self)];
+        next(self);
+        
+        u8 reg2 = self->reg[fetch(self)];
+        next(self);
+        
+        // i am one sneaky boy. i hope no one bullies me for this silly
+        i16 diff = (i16)reg1 - reg2;
+        
+#define sign_16 (1 << 15)
+        
+        if(diff == 0)
+        {
+          self->reg[rt_flags] |= ft_zero;
+        }
+        else if(diff & sign_16)
+        {
+          self->reg[rt_flags] |= ft_sign;
+        }
+        else
+        {
+          self->reg[rt_flags] |= ft_carry;
+        }
+        
+        
+      }break;
+      case op_je:
+      {
+        exec_jmp_instr(self, ft_zero);
+      }break;
+      
+      case op_jl:
+      {
+        exec_jmp_instr(self, ft_sign);
+      }break;
+      
+      case op_jg:
+      {
+        exec_jmp_instr(self, ft_carry);
+      }break;
+      
       
       default:
       return;

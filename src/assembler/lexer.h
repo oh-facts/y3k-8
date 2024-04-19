@@ -1,6 +1,8 @@
 #ifndef LEXER_H
 #define LEXER_H
 
+// todo(facts): generate the op/reg in token type using language.h
+
 gen_string_from_enum
 enum token_type 
 {
@@ -23,8 +25,12 @@ enum token_type
   tk_addr,
   tk_jmp,
   tk_use,
+  tk_cmp,
+  tk_jg,
+  tk_jl,
+  tk_je,
   
-  // keywords
+  
   tk_iden,
   tk_lit,
   

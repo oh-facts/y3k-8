@@ -101,10 +101,7 @@ internal void resolve_labels(struct parser* parser)
       struct Node* label_call = parser->label_calls[j];
       if(strcmp(label_decl->token.lexeme, label_call->token.lexeme) == 0)
       {
-        if(label_call->type == NODE_LABEL)
-        {
-          label_call->label_node.origin = label_decl; 
-        }
+        label_call->label_node.origin = label_decl; 
       }
     }
   }
@@ -249,21 +246,32 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
       {
         curr->next = make_instr_rv(parser,arena);
       }break;
+      
       case tk_movr:
       case tk_addr:
       case tk_use:
+      case tk_cmp:
       {
         curr->next = make_instr_rr(parser,arena);
       }break;
+      
       case tk_jmp:
+      case tk_jg:
+      case tk_jl:
+      case tk_je:
       {
         curr->next = make_instr_l(parser, arena);
       }break;
       case tk_iden:
       {
+        // label decl
         if((parser->tokens + 1)->type == tk_colon)
         {
           curr->next = make_label_decl_node(parser,arena);
+        }
+        else
+        {
+          INVALID_CODE_PATH();
         }
       }break;
       default:

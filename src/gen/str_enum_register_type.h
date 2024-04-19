@@ -13,5 +13,6 @@ global const char* str_enum_register_type[] =
 	"rt_r8",
 	"rt_acc",
 	"rt_ip",
+	"rt_flags",
 	"rt_num",
 };

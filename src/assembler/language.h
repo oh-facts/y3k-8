@@ -1,11 +1,6 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
-// todo(facts): Make a language enum that holds everything relevant to the language
-// you can put that inside assembler
-// make a computer.h that holds computer related stuff
-// the assemlber can have a backends/fcpu that holds translations to relevant addresses
-
 gen_string_from_enum
 enum keywords
 {
@@ -25,6 +20,10 @@ enum keywords
   addr,
   jmp,
   use,
+  cmp,
+  jg,
+  jl,
+  je,
   kw_num,
 };
 

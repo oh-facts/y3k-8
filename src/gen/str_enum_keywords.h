@@ -17,5 +17,9 @@ global const char* str_enum_keywords[] =
 	"addr",
 	"jmp",
 	"use",
+	"cmp",
+	"jg",
+	"jl",
+	"je",
 	"kw_num",
 };

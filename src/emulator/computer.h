@@ -18,10 +18,22 @@ enum register_type
   rt_r8 = 0x08,
   rt_acc,
   rt_ip,
+  rt_flags,
   rt_num
 };
 
 typedef enum register_type register_type;
+
+gen_string_from_enum
+enum flag_type
+{
+  ft_zero = (1 << 0),
+  ft_sign = (1 << 1),
+  ft_carry = (1 << 2),
+  ft_num,
+};
+
+typedef enum flag_type flag_type;
 
 gen_string_from_enum
 enum opcode_type
@@ -33,6 +45,10 @@ enum opcode_type
   op_addr,
   op_jmp,
   op_use,
+  op_cmp,
+  op_jg,
+  op_jl,
+  op_je,
   opcode_num
 };
 
