@@ -1,59 +1,50 @@
-struct logger
-{
-  device_logger_state state;
-};
 
 struct Device
 {
   u8 device_slot;
   device_type type;
   device_state state;
-  
-  union
-  {
-    struct logger logger;
-  };
 };
 
-i8 use_device(struct Device* device, i8 in)
+// the idea was that use does both input and output,
+// use device input &ouput
+// but i am unsure about this design, so for now, the
+// return value is unused by the callers
+// then i changed it to this. i am still unhappy with it, but I don;t
+// care since I don;t have enough devices to understand what would
+// be optimal
+void use_device(device_type type, i8 in)
 {
-  switch (device->type)
+  switch (type)
   {
     case dt_invalid:
     {
       printl("device type not initialized. This is a bug");
     }break;
-    case dt_logger:
+    
+    case dt_logger_int:
     {
-      if(device->state == ds_off)
-      {
-        //printl("logger connected with mode %s",str_enum_device_logger_state[in]);
-        device->logger.state = in;
-        device->state = ds_on;
-        return 1;
-      }
-      else
-      {
-        if(device->logger.state == dls_int)
-          printf("%d",in);
-        return in;
-      }
-      
+      printf("%hhu",in);
     }break;
+    
+    case dt_logger_char:
+    {
+      printf("%c",in);
+    }break;
+    
     default:
     {
       printl("Control shouldn't be here");
     }
   }
   
-  return -1;
 }
 
 struct Computer
 {
   u8 reg[rt_num];
   u8 *ram;
-  struct Device devices[dt_num];
+  struct Device devices[256];
 };
 
 internal u8 fetch(struct Computer *self)
@@ -134,16 +125,15 @@ internal void execute(struct Computer *self)
       //note(facts): I hate this usage. think of better api when you work on devices properly. even i don't remember how it works, i copy paste my old asm
       case op_use:
       {
-        static struct Device dc = {0};
         next(self);
         
-        dc.type = self->reg[fetch(self)];
+        device_type type = self->reg[fetch(self)];
         next(self);
         
         u8 in = fetch(self);
         next(self);
         
-        use_device(&dc, self->reg[in]);
+        use_device(type, self->reg[in]);
       }break;
       
       case op_jmp:

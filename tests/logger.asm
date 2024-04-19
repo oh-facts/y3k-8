@@ -12,3 +12,5 @@ L1:
     jmpx L1, 3      ; (like a for loop that loops 3 times)
     
     ;  haven't added comparisons, so this will have to do it like this
+    ;  jmpx has since been removed since i have added comparisions. i need to 
+    ;  update this example

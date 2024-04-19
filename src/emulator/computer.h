@@ -58,7 +58,8 @@ gen_string_from_enum
 enum device_type
 {
   dt_invalid,
-  dt_logger,
+  dt_logger_int,
+  dt_logger_char,
   dt_num
 };
 
