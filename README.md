@@ -42,7 +42,7 @@ When you run the emulator, you will see the binary's output (if its using a logg
 
 Open an issue before you choose to work on it because it is possible I am aware / working on it. This isn't needed if we already spoke elsewhere. (however, when doing a pr, explain the thing for documentation's sake).
 
-All build systems for C/C++ are inreedemably bad. This project will never use one. I have bat scripts in my root directory to automate things that mean to me but I gitignore them. Feel free to do the same with shell/make/ninja/cmake if you prefer. Add them to the gitignore, or don't track them yourself.
+I have bat scripts in my root directory to automate things that hold meaning to me but I gitignore them. Feel free to do the same with shell/make/ninja/cmake if you prefer. Add them to the gitignore if you're using them.
 
 Report bugs if you find them. Work on them if you want to. Make an issue first.
 
