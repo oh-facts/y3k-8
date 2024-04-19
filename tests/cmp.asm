@@ -11,8 +11,8 @@ movv r7, 62    ; '>'
     
 movv r8, 32    ; ' '
  
-movv r1, 25	 ; the numbers we are comparing
-movv r2, -23   
+movv r1, -25	 ; the numbers we are comparing
+movv r2, 23   
 
 use r4, r1
 use r3, r8

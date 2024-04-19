@@ -15,7 +15,7 @@
 | je   | if(Z) { IP = L } |
 
 R:  Register (r1 - r8)
-V:  value    (unsigned 8 bit number (lol))
+V:  value    (8 bit literal)
 L:  Label
 IP: instruction pointer
 S:  Sign flag
