@@ -24,7 +24,7 @@ typedef enum NODE_TYPE NODE_TYPE;
 
 struct OpNode
 {
-  opcode_type type;
+  i32 temp;
 };
 
 struct LitNode
@@ -34,7 +34,7 @@ struct LitNode
 
 struct RegNode
 {
-  register_type type;
+  i32 temp;
 };
 
 struct LabelDeclNode
