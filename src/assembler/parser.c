@@ -1,4 +1,13 @@
 // fcpu backend
+internal u8 opcode_type_to_bin(token_type tk)
+{
+  return (opcode_type)(tk - tk_movv + 1);
+}
+
+internal u8 reg_type_to_bin(token_type tk)
+{
+  return (register_type)tk;
+}
 
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look better
 
@@ -10,7 +19,8 @@ internal void print_node(struct Node* node)
     {
       printl("invalid node");
     }break;
-    case NODE_INSTR_XX:
+    case NODE_INSTR_RR:
+    case NODE_INSTR_RV:
     {
       print_node(node->instr_node.opcode);
       
@@ -102,6 +112,7 @@ internal struct Node *make_op_node(struct parser* parser, struct Arena* arena)
   struct Node* out = push_struct(arena, struct Node);
   out->type = NODE_OP;
   out->token = *parser->tokens;
+  out->op_node.type = opcode_type_to_bin(parser->tokens->type);
   
   //consume
   parser->tokens++;
@@ -127,6 +138,7 @@ internal struct Node *make_reg_node(struct parser* parser, struct Arena* arena)
   struct Node* out  = push_struct(arena,struct Node);
   out->type = NODE_REGISTER;
   out->token = *parser->tokens;
+  out->reg_node.type =  reg_type_to_bin(parser->tokens->type);
   
   //consume
   parser->tokens++;
@@ -150,10 +162,10 @@ internal struct Node *make_label_node(struct parser* parser, struct Arena* arena
 
 // Parsing Statements
 
-internal struct Node *make_instr_xx(struct parser* parser, struct Arena* arena)
+internal struct Node *make_instr_rr(struct parser* parser, struct Arena* arena)
 {
   struct Node* out = push_struct(arena, struct Node);
-  out->type = NODE_INSTR_XX;
+  out->type = NODE_INSTR_RR;
   out->token = *parser->tokens;
   
   out->instr_node.opcode = make_op_node(parser, arena);
