@@ -1,3 +1,14 @@
+// fcpu backend
+internal u8 opcode_type_to_bin(token_type tk)
+{
+  return (opcode_type)(tk - tk_movv + 1);
+}
+
+internal u8 reg_type_to_bin(token_type tk)
+{
+  return (register_type)tk;
+}
+
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look better
 
 internal void print_node(struct Node* node)
@@ -101,6 +112,7 @@ internal struct Node *make_op_node(struct parser* parser, struct Arena* arena)
   struct Node* out = push_struct(arena, struct Node);
   out->type = NODE_OP;
   out->token = *parser->tokens;
+  out->op_node.type = opcode_type_to_bin(parser->tokens->type);
   
   //consume
   parser->tokens++;
@@ -126,6 +138,7 @@ internal struct Node *make_reg_node(struct parser* parser, struct Arena* arena)
   struct Node* out  = push_struct(arena,struct Node);
   out->type = NODE_REGISTER;
   out->token = *parser->tokens;
+  out->reg_node.type =  reg_type_to_bin(parser->tokens->type);
   
   //consume
   parser->tokens++;
@@ -185,20 +198,6 @@ internal struct Node *make_instr_rv(struct parser* parser, struct Arena* arena)
   return out;
 }
 
-internal token_type peek_token_type(struct parser *parser)
-{
-  return (parser->tokens + 1)->type;
-}
-
-internal struct Node *make_instr(struct parser *parser, struct Arena *arena)
-{
-  struct Node* out = push_struct(arena, struct Node);
-  
-  if(peek_token_type(parser) == 
-     
-     return out;
-}
-
 internal struct Node *make_instr_l(struct parser* parser, struct Arena* arena)
 {
   struct Node* out = push_struct(arena, struct Node);
@@ -242,13 +241,19 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
   {
     switch (parser->tokens->type)
     {
-      case tk_mov:
-      case tk_add:
+      case tk_movv:
+      case tk_addv:
+      {
+        curr->next = make_instr_rv(parser,arena);
+      }break;
+      
+      case tk_movr:
+      case tk_addr:
       case tk_use:
       case tk_cmp:
       case tk_icmp:
       {
-        curr->next = make_instr(parser,arena);
+        curr->next = make_instr_rr(parser,arena);
       }break;
       
       case tk_jmp:
