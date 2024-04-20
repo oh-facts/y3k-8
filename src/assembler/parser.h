@@ -7,8 +7,7 @@ enum NODE_TYPE
   NODE_INVALID,
   
   // statements
-  NODE_INSTR_RR,
-  NODE_INSTR_RV,
+  NODE_INSTR,
   NODE_INSTR_L,
   NODE_LABEL_DECL,
   NODE_USE,
@@ -49,12 +48,12 @@ struct LabelNode
 
 struct Node;
 
-typedef struct InstrNode
+struct InstrNode
 {
   struct Node* opcode;
   struct Node* param1;
   struct Node* param2;
-}InstrNodeRR, InstrNodeRV;
+};
 
 // todo(facts): I just realized I am using L for both literals and ints. Fix this.
 struct InstrNodeL
