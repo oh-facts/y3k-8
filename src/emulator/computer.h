@@ -39,8 +39,10 @@ gen_string_from_enum
 enum opcode_type
 {
   invalid_op = 0x00,
-  op_mov,
-  op_add,
+  op_movv,
+  op_movr,
+  op_addv,
+  op_addr,
   op_jmp,
   op_use,
   op_cmp,
@@ -52,17 +54,6 @@ enum opcode_type
 };
 
 typedef enum opcode_type opcode_type;
-
-gen_string_from_enum
-enum mod_type
-{
-  mod_invalid,
-  mod_r,
-  mod_v,
-  mod_count,
-};
-
-typedef enum mod_type mod_type;
 
 gen_string_from_enum
 enum device_type

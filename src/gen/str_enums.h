@@ -7,4 +7,3 @@
 #include "str_enum_register_type.h"
 #include "str_enum_token_type.h"
 #include "str_enum_flag_type.h"
-#include "str_enum_mod_type.h"

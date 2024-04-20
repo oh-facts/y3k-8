@@ -3,8 +3,10 @@
 global const char* str_enum_opcode_type[] =
 {
 	"invalid_op",
-	"op_mov",
-	"op_add",
+	"op_movv",
+	"op_movr",
+	"op_addv",
+	"op_addr",
 	"op_jmp",
 	"op_use",
 	"op_cmp",

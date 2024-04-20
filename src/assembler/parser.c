@@ -1,3 +1,14 @@
+// fcpu backend
+internal u8 opcode_type_to_bin(token_type tk)
+{
+  return (opcode_type)(tk - tk_movv + 1);
+}
+
+internal u8 reg_type_to_bin(token_type tk)
+{
+  return (register_type)tk;
+}
+
 // todo(facts): Maybe make an int offset that adds an offset when printing so they look better
 
 internal void print_node(struct Node* node)
