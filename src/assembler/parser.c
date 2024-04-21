@@ -18,10 +18,7 @@ internal void print_node(struct Node* node)
     {
       printl("invalid node");
     }break;
-    case NODE_INSTR_RR:
-    case NODE_INSTR_RV:
-    case NODE_INSTR_VV:
-    case NODE_INSTR_VR:
+    case NODE_INSTR_XX:
     {
       print_node(node->instr_node.opcode);
       
@@ -166,11 +163,12 @@ internal struct Node *make_instr(struct parser *parser, struct Arena *arena)
 {
   struct Node* out = push_struct(arena, struct Node);
   out->token = *parser->tokens;
-  
+  out->type = NODE_INSTR_XX;
   out->instr_node.opcode = make_op_node(parser, arena);
   
   if(parser->tokens->type >= tk_r1 && parser->tokens->type <= tk_r8)
   {
+    
     out->instr_node.param1 = make_reg_node(parser,arena);
     // consume ","
     parser->tokens++;
@@ -178,12 +176,13 @@ internal struct Node *make_instr(struct parser *parser, struct Arena *arena)
     if(parser->tokens->type >= tk_r1 && parser->tokens->type <= tk_r8)
     {
       out->instr_node.param2 = make_reg_node(parser,arena);
-      out->type = NODE_INSTR_RR;
+      out->instr_node.type = arg_rr;
     }
     else
     {
       out->instr_node.param2 = make_lit_node(parser,arena);
       out->type = NODE_INSTR_RV;
+      out->instr_node.type = arg_rv;
     }
     
   }
@@ -197,12 +196,12 @@ internal struct Node *make_instr(struct parser *parser, struct Arena *arena)
     if(parser->tokens->type >= tk_r1 && parser->tokens->type <= tk_r8)
     {
       out->instr_node.param2 = make_reg_node(parser,arena);
-      out->type = NODE_INSTR_VR;
+      out->instr_node.type = arg_vr;
     }
     else
     {
       out->instr_node.param2 = make_lit_node(parser,arena);
-      out->type = NODE_INSTR_VV;
+      out->instr_node.type = arg_vv;
     }
     
   }
