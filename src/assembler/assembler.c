@@ -34,7 +34,7 @@ u8* assemble(struct parser* parser, struct Arena* arena)
       case NODE_INSTR_RV:
       {
         bin[bindex++] = node->instr_node.opcode->op_node.type;  
-        
+        bin[bindex++] = arg_rv;
         bin[bindex++] = node->instr_node.param1->reg_node.type;  
         
         bin[bindex++] = node->instr_node.param2->lit_node.num;
@@ -44,13 +44,29 @@ u8* assemble(struct parser* parser, struct Arena* arena)
       case NODE_INSTR_RR:
       {
         bin[bindex++] = node->instr_node.opcode->op_node.type;  
-        
+        bin[bindex++] = arg_rr;
         bin[bindex++] = node->instr_node.param1->reg_node.type;  
         
         bin[bindex++] = node->instr_node.param2->reg_node.type;
         
       }break;
-      
+      case NODE_INSTR_VV:
+      {
+        bin[bindex++] = node->instr_node.opcode->op_node.type;  
+        bin[bindex++] = arg_vv;
+        bin[bindex++] = node->instr_node.param1->lit_node.num;  
+        
+        bin[bindex++] = node->instr_node.param2->lit_node.num;
+        
+      }break;
+      case NODE_INSTR_VR:
+      {
+        bin[bindex++] = node->instr_node.opcode->op_node.type;  
+        bin[bindex++] = arg_vr;
+        bin[bindex++] = node->instr_node.param1->lit_node.num;  
+        
+        bin[bindex++] = node->instr_node.param2->reg_node.type;
+      }
       case NODE_LABEL_DECL:
       {
         defn.id[defn.num] = node->label_decl_node.id;

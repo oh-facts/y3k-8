@@ -1,32 +1,30 @@
-; imagine these were variables
-    movv r6, 3     ; uint logger
-    movv r7, 1     ; char logger
-    movv r8, 10    ; new line ascii
+; 3  uint logger
+; 1 char logger
+; 10 new line ascii
 
-movv r1, 0
-movv r2, 1
+mov r1, 0
+mov r2, 1
 
-use r6, r1				; print r1
-use r7, r8        ; print new line
+use 3, r1				; print r1
+use 1, 10        ; print new line
 
-use r6, r2
-use r7, r8
+use 3, r2
+use 1, 10
 
-movv r4, 2
-movv r5, 14				; more than that and it overflows
+mov r4, 2
 
 L1:
-		movr r3, r2
-    addr r3, r1
+		mov r3, r2
+    add r3, r1
 	  
-    movr r1, r2
-    movr r2, r3
+    mov r1, r2
+    mov r2, r3
 
-    use  r6, r3
-    use  r7, r8
-    addv r4, 1
+    use  3, r3
+    use  1, 10
+    add r4, 1
     
-    cmp r4, r5
+    cmp r4, 14
     jl L1
 
 

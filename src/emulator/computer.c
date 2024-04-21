@@ -17,13 +17,19 @@ else\
 #define EXEC_CMP(self, type) \
 self->reg[rt_flags] = 0; \
 next(self); \
+arg_type mod = fetch(self);\
+next(self);\
 \
-type reg1 = self->reg[fetch(self)]; \
+type fst = self->reg[fetch(self)]; \
 next(self); \
-type reg2 = self->reg[fetch(self)]; \
+type snd = fetch(self); \
 \
 next(self); \
-SET_FLAGS_EQUAL(self, reg1, reg2);
+if(mod == arg_rr) \
+{ \
+snd = self->reg[snd];\
+}\
+SET_FLAGS_EQUAL(self, fst, snd);
 
 struct Device
 {
@@ -107,21 +113,11 @@ internal void execute(struct Computer *self)
   {
     switch (fetch(self))
     {
-      case op_movv:
+      case op_mov:
       {
         next(self);
         
-        u8 dst = fetch(self);
-        next(self);
-        
-        u8 src = fetch(self);
-        next(self);
-        
-        self->reg[dst] = src;
-      }break;
-      
-      case op_movr:
-      {   
+        arg_type mod = fetch(self);
         next(self);
         
         u8 dst = fetch(self);
@@ -130,24 +126,26 @@ internal void execute(struct Computer *self)
         u8 src = fetch(self);
         next(self);
         
-        self->reg[dst] = self->reg[src];
+        if(mod == arg_rv)
+        {
+          self->reg[dst] = src;
+        }
+        else if(mod == arg_rr)
+        {
+          self->reg[dst] = self->reg[src];
+        }
+        else
+        {
+          INVALID_CODE_PATH();
+        }
       }break;
       
-      case op_addv:
+      case op_add:
       {
         next(self);
         
-        u8 dst = fetch(self);
-        next(self);
         
-        u8 src = fetch(self);
-        next(self);
-        
-        self->reg[dst] += src;                
-      }break;
-      
-      case op_addr:
-      {
+        arg_type mod = fetch(self);
         next(self);
         
         u8 dst = fetch(self);
@@ -156,20 +154,52 @@ internal void execute(struct Computer *self)
         u8 src = fetch(self);
         next(self);
         
-        self->reg[dst] += self->reg[src];
+        if(mod == arg_rv)
+        {
+          self->reg[dst] += src;                
+        }
+        else if(mod == arg_rr)
+        {
+          self->reg[dst] += self->reg[src];
+        }
+        else
+        {
+          INVALID_CODE_PATH();
+        }
+        
       }break;
       //note(facts): I hate this usage. think of better api when you work on devices properly. even i don't remember how it works, i copy paste my old asm
       case op_use:
       {
         next(self);
         
-        device_type type = self->reg[fetch(self)];
+        arg_type mod = fetch(self);
+        next(self);
+        
+        u8 type = fetch(self);
         next(self);
         
         u8 in = fetch(self);
         next(self);
         
-        use_device(type, self->reg[in]);
+        if(mod == arg_rv)
+        {
+          type = self->reg[type];
+          use_device(type, in);
+        }
+        else if(mod == arg_rr)
+        {
+          type = self->reg[type];
+          use_device(type, self->reg[in]);
+        }
+        else if(mod == arg_vv)
+        {
+          use_device(type, in);
+        }
+        else if(mod == arg_vr)
+        {
+          use_device(type, self->reg[in]);
+        }
       }break;
       
       case op_jmp:

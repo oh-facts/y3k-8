@@ -1,7 +1,6 @@
-// fcpu backend
 internal u8 opcode_type_to_bin(token_type tk)
 {
-  return (opcode_type)(tk - tk_movv + 1);
+  return (opcode_type)(tk - tk_mov + 1);
 }
 
 internal u8 reg_type_to_bin(token_type tk)
@@ -21,6 +20,8 @@ internal void print_node(struct Node* node)
     }break;
     case NODE_INSTR_RR:
     case NODE_INSTR_RV:
+    case NODE_INSTR_VV:
+    case NODE_INSTR_VR:
     {
       print_node(node->instr_node.opcode);
       
@@ -113,7 +114,6 @@ internal struct Node *make_op_node(struct parser* parser, struct Arena* arena)
   out->type = NODE_OP;
   out->token = *parser->tokens;
   out->op_node.type = opcode_type_to_bin(parser->tokens->type);
-  
   //consume
   parser->tokens++;
   
@@ -162,38 +162,51 @@ internal struct Node *make_label_node(struct parser* parser, struct Arena* arena
 
 // Parsing Statements
 
-internal struct Node *make_instr_rr(struct parser* parser, struct Arena* arena)
+internal struct Node *make_instr(struct parser *parser, struct Arena *arena)
 {
   struct Node* out = push_struct(arena, struct Node);
-  out->type = NODE_INSTR_RR;
   out->token = *parser->tokens;
   
   out->instr_node.opcode = make_op_node(parser, arena);
   
-  out->instr_node.param1 = make_reg_node(parser, arena);
+  if(parser->tokens->type >= tk_r1 && parser->tokens->type <= tk_r8)
+  {
+    out->instr_node.param1 = make_reg_node(parser,arena);
+    // consume ","
+    parser->tokens++;
+    
+    if(parser->tokens->type >= tk_r1 && parser->tokens->type <= tk_r8)
+    {
+      out->instr_node.param2 = make_reg_node(parser,arena);
+      out->type = NODE_INSTR_RR;
+    }
+    else
+    {
+      out->instr_node.param2 = make_lit_node(parser,arena);
+      out->type = NODE_INSTR_RV;
+    }
+    
+  }
+  else
+  {
+    out->instr_node.param1 = make_lit_node(parser,arena);
+    
+    // consume ","
+    parser->tokens++;
+    
+    if(parser->tokens->type >= tk_r1 && parser->tokens->type <= tk_r8)
+    {
+      out->instr_node.param2 = make_reg_node(parser,arena);
+      out->type = NODE_INSTR_VR;
+    }
+    else
+    {
+      out->instr_node.param2 = make_lit_node(parser,arena);
+      out->type = NODE_INSTR_VV;
+    }
+    
+  }
   
-  // consume ","
-  parser->tokens++;
-  
-  out->instr_node.param2 = make_reg_node(parser,arena);
-  
-  return out;
-}
-
-internal struct Node *make_instr_rv(struct parser* parser, struct Arena* arena)
-{
-  struct Node* out = push_struct(arena, struct Node);
-  out->type = NODE_INSTR_RV;
-  out->token = *parser->tokens;
-  
-  out->instr_node.opcode = make_op_node(parser, arena);
-  
-  out->instr_node.param1 = make_reg_node(parser, arena);
-  
-  // consume ","
-  parser->tokens++;
-  
-  out->instr_node.param2 = make_lit_node(parser,arena);
   
   return out;
 }
@@ -241,19 +254,14 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
   {
     switch (parser->tokens->type)
     {
-      case tk_movv:
-      case tk_addv:
-      {
-        curr->next = make_instr_rv(parser,arena);
-      }break;
       
-      case tk_movr:
-      case tk_addr:
+      case tk_mov:
+      case tk_add:
       case tk_use:
       case tk_cmp:
       case tk_icmp:
       {
-        curr->next = make_instr_rr(parser,arena);
+        curr->next = make_instr(parser,arena);
       }break;
       
       case tk_jmp:

@@ -9,6 +9,9 @@ enum NODE_TYPE
   // statements
   NODE_INSTR_RR,
   NODE_INSTR_RV,
+  NODE_INSTR_VV,
+  NODE_INSTR_VR,
+  
   NODE_INSTR_L,
   NODE_LABEL_DECL,
   NODE_USE,

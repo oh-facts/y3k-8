@@ -1,14 +1,11 @@
-; logger stuff
-    movv r5, 1     ; char code
-    movv r6, 3     ; uint code
-    movv r7, 10    ; new line
+; 1 char logger
+; 3 uint logger
+
 ; 
 
-    movv r1, 0      ; r1 = 0
+    mov r1, 0       ; r1 = 0
 L1:
-    addv r1, 1      ; r1 += 1
-    use  r6, r1     ;
-    use  r5, r7     ;
-    jmp  L1         ; 
-    
-    ;  haven't added comparisons, so this will have to do it like this
+    add  r1, 1      ; r1 += 1
+    use  3, r1      ; 
+    use  1, 10      ; new line
+    jmp  L1         ;

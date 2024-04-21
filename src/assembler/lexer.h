@@ -19,10 +19,8 @@ enum token_type
   tk_r8,
   
   // op
-  tk_movv,
-  tk_movr,
-  tk_addv,
-  tk_addr,
+  tk_mov,
+  tk_add,
   tk_jmp,
   tk_use,
   tk_cmp,

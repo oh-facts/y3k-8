@@ -16,10 +16,8 @@ enum keywords
   r7,
   r8,
   
-  movv,
-  movr,
-  addv,
-  addr,
+  mov,
+  add,
   jmp,
   use,
   cmp,
