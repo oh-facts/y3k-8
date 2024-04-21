@@ -57,14 +57,11 @@ gen_string_from_enum
 enum arg_type
 {
   arg_invalid,
-  arg_vv,
-  arg_rv,
-  arg_vr,
-  arg_rr,
+  arg_v,
+  arg_r,
   arg_num
 };
 typedef enum arg_type arg_type;
-
 
 gen_string_from_enum
 enum device_type
