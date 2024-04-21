@@ -1,7 +1,7 @@
 // fcpu backend
 internal u8 opcode_type_to_bin(token_type tk)
 {
-  return (opcode_type)(tk - tk_movv + 1);
+  return (opcode_type)(tk - tk_mov + 1);
 }
 
 internal u8 reg_type_to_bin(token_type tk)

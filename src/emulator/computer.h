@@ -39,10 +39,8 @@ gen_string_from_enum
 enum opcode_type
 {
   invalid_op = 0x00,
-  op_movv,
-  op_movr,
-  op_addv,
-  op_addr,
+  op_mov,
+  op_add,
   op_jmp,
   op_use,
   op_cmp,
@@ -54,6 +52,17 @@ enum opcode_type
 };
 
 typedef enum opcode_type opcode_type;
+
+gen_string_from_enum
+enum arg_type
+{
+  invalid_at,
+  at_rv,
+  at_rr,
+  at_num
+};
+
+typedef enum arg_type arg_type;
 
 gen_string_from_enum
 enum device_type
