@@ -8,12 +8,12 @@
 | mul  | R  = VR * VR     |
 | dave | R  = VR / VR     |
 | jmp  | IP = L           |
-| use  | check devices    |
-| cmp  | sets S/Z/C to 1  |
-| icmp | sets S/Z/C to 1  |
 | jg   | if(C) { IP = L } |
 | jl   | if(S) { IP = L } |
 | je   | if(Z) { IP = L } |
+| cmp  | sets S/Z/C to 1  |
+| icmp | sets S/Z/C to 1  |
+| use  | check devices    |
 
 R :  Register (r1 - r8)
 V :  value    (8 bit literal)
