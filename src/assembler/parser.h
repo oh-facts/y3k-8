@@ -7,7 +7,10 @@ enum NODE_TYPE
   NODE_INVALID,
   
   // statements
-  NODE_INSTR_XX,
+  NODE_INSTR_RR,
+  NODE_INSTR_RV,
+  NODE_INSTR_VV,
+  NODE_INSTR_VR,
   
   NODE_INSTR_L,
   NODE_LABEL_DECL,
@@ -52,22 +55,8 @@ struct Node;
 typedef struct InstrNode
 {
   struct Node* opcode;
-  
-  union
-  {
-    struct
-    {
-      // brain wave. store param types here
-      // then later the assemlber can emit
-      // whatever it wants
-      // this way i wont even need rv, rr, vv node types
-      struct Node *param1;
-      struct Node *param2;
-    };
-    struct Node *params[2];
-    arg_type type;
-  };
-  
+  struct Node* param1;
+  struct Node* param2;
 }InstrNodeRR, InstrNodeRV;
 
 // todo(facts): I just realized I am using L for both literals and ints. Fix this.

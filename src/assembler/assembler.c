@@ -31,22 +31,13 @@ u8* assemble(struct parser* parser, struct Arena* arena)
     
     switch(node->type)
     {
-      case NODE_INSTR_XX:
-      {
-        if(node->instr_node.type == arg_rr)
-        {
-          bin[bindex++] = node->instr_node.opcode->op_node.type;  
-          bin[bindex++] = arg_rr;
-          bin[bindex++] = node->instr_node.param1->reg_node.type;  
-          
-          bin[bindex++] = node->instr_node.param2->lit_node.num;
-          
-        }
-        bin[bindex] = 
-      }break;
-      
       case NODE_INSTR_RV:
       {
+        bin[bindex++] = node->instr_node.opcode->op_node.type;  
+        bin[bindex++] = arg_rv;
+        bin[bindex++] = node->instr_node.param1->reg_node.type;  
+        
+        bin[bindex++] = node->instr_node.param2->lit_node.num;
         
       }break;
       
