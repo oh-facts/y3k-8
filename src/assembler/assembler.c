@@ -17,7 +17,7 @@ struct calls
 
 u8* assemble(struct parser* parser, struct Arena* arena)
 {
-  u8* bin = push_array(arena, u8, 100);
+  u8* bin = push_array(arena, u8, 300);
   u32 bindex = 0;
   
   struct Node* node = parser->first;
@@ -33,49 +33,28 @@ u8* assemble(struct parser* parser, struct Arena* arena)
     {
       case NODE_INSTR_XX:
       {
-        if(node->instr_node.type == arg_rr)
+        bin[bindex++] = node->instr_node.opcode->op_node.type;  
+        for(u32 i = 0; i < 2; i ++)
         {
-          bin[bindex++] = node->instr_node.opcode->op_node.type;  
-          bin[bindex++] = arg_rr;
-          bin[bindex++] = node->instr_node.param1->reg_node.type;  
-          
-          bin[bindex++] = node->instr_node.param2->lit_node.num;
+          if(node->instr_node.types[i] == arg_v)
+          {
+            bin[bindex++] = arg_v;
+            bin[bindex++] = node->instr_node.params[i]->lit_node.num;
+          }
+          else if(node->instr_node.types[i] == arg_r)
+          {
+            bin[bindex++] = arg_r;
+            bin[bindex++] = node->instr_node.params[i]->reg_node.type;  
+          }
+          else
+          {
+            INVALID_CODE_PATH();
+          }
           
         }
-        bin[bindex] = 
-      }break;
-      
-      case NODE_INSTR_RV:
-      {
         
       }break;
       
-      case NODE_INSTR_RR:
-      {
-        bin[bindex++] = node->instr_node.opcode->op_node.type;  
-        bin[bindex++] = arg_rr;
-        bin[bindex++] = node->instr_node.param1->reg_node.type;  
-        
-        bin[bindex++] = node->instr_node.param2->reg_node.type;
-        
-      }break;
-      case NODE_INSTR_VV:
-      {
-        bin[bindex++] = node->instr_node.opcode->op_node.type;  
-        bin[bindex++] = arg_vv;
-        bin[bindex++] = node->instr_node.param1->lit_node.num;  
-        
-        bin[bindex++] = node->instr_node.param2->lit_node.num;
-        
-      }break;
-      case NODE_INSTR_VR:
-      {
-        bin[bindex++] = node->instr_node.opcode->op_node.type;  
-        bin[bindex++] = arg_vr;
-        bin[bindex++] = node->instr_node.param1->lit_node.num;  
-        
-        bin[bindex++] = node->instr_node.param2->reg_node.type;
-      }
       case NODE_LABEL_DECL:
       {
         defn.id[defn.num] = node->label_decl_node.id;

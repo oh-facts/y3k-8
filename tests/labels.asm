@@ -1,24 +1,24 @@
 		jmp L2
 L1:
-		addv r1, 1
+		add r1, 1
     jmp  L4
-		addv r1, 1		; skipped
+		add r1, 1		; skipped
 
 L2: 
-		movv r2, 2
+		mov r2, 2
 		jmp L1
 
 L3:
-		movv r3, 3		; skipped
+		mov r3, 3		; skipped
 
 L4: 
-		movv r4, 4
+		mov r4, 4
     jmp L5
 
 L5:
 L6:
 L7:
-   movv r5, 5
+   mov r5, 5
 L8:
 L9:
 

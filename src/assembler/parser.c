@@ -1,3 +1,4 @@
+// do this inside assembler?
 internal u8 opcode_type_to_bin(token_type tk)
 {
   return (opcode_type)(tk - tk_mov + 1);
@@ -89,6 +90,7 @@ internal void print_nodes(struct parser* parser)
   printn();
 }
 
+// matching label decl and call lexemes
 internal void resolve_labels(struct parser* parser)
 {
   for(u32 i = 0; i < parser->num_label_decls; i ++)
@@ -159,53 +161,37 @@ internal struct Node *make_label_node(struct parser* parser, struct Arena* arena
 
 // Parsing Statements
 
-internal struct Node *make_instr(struct parser *parser, struct Arena *arena)
+internal struct Node *make_instr_xx(struct parser *parser, struct Arena *arena)
 {
   struct Node* out = push_struct(arena, struct Node);
   out->token = *parser->tokens;
   out->type = NODE_INSTR_XX;
   out->instr_node.opcode = make_op_node(parser, arena);
   
-  if(parser->tokens->type >= tk_r1 && parser->tokens->type <= tk_r8)
+  u32 i = 0;
+  while(1)
   {
-    
-    out->instr_node.param1 = make_reg_node(parser,arena);
-    // consume ","
-    parser->tokens++;
-    
     if(parser->tokens->type >= tk_r1 && parser->tokens->type <= tk_r8)
     {
-      out->instr_node.param2 = make_reg_node(parser,arena);
-      out->instr_node.type = arg_rr;
+      out->instr_node.params[i] = make_reg_node(parser,arena);
+      out->instr_node.types[i] = arg_r;
     }
     else
     {
-      out->instr_node.param2 = make_lit_node(parser,arena);
-      out->type = NODE_INSTR_RV;
-      out->instr_node.type = arg_rv;
+      out->instr_node.params[i] = make_lit_node(parser,arena);
+      out->instr_node.types[i] = arg_v;
     }
-    
-  }
-  else
-  {
-    out->instr_node.param1 = make_lit_node(parser,arena);
-    
     // consume ","
-    parser->tokens++;
-    
-    if(parser->tokens->type >= tk_r1 && parser->tokens->type <= tk_r8)
+    if(parser->tokens->type == tk_comma)
     {
-      out->instr_node.param2 = make_reg_node(parser,arena);
-      out->instr_node.type = arg_vr;
+      i++;
+      parser->tokens++;
     }
     else
     {
-      out->instr_node.param2 = make_lit_node(parser,arena);
-      out->instr_node.type = arg_vv;
+      break;
     }
-    
   }
-  
   
   return out;
 }
@@ -260,7 +246,7 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
       case tk_cmp:
       case tk_icmp:
       {
-        curr->next = make_instr(parser,arena);
+        curr->next = make_instr_xx(parser,arena);
       }break;
       
       case tk_jmp:

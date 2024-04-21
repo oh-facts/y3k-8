@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
     
     u8* bin = assemble(&parser, &arena);
     
-    if(!yk_write_binary_file(argv[2], bin,100))
+    if(!yk_write_binary_file(argv[2], bin,300))
     {
       printf("Failed to output binary %s", argv[2]);
     }

@@ -57,16 +57,16 @@ typedef struct InstrNode
   {
     struct
     {
-      // brain wave. store param types here
-      // then later the assemlber can emit
-      // whatever it wants
-      // this way i wont even need rv, rr, vv node types
       struct Node *param1;
       struct Node *param2;
     };
     struct Node *params[2];
-    arg_type type;
   };
+  arg_type types[2];
+  
+  // add a num arguments field here.
+  // and make everything dyn arrays of pointers?? Or
+  // just make them 3 or 4 large
   
 }InstrNodeRR, InstrNodeRV;
 

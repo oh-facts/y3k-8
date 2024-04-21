@@ -1,5 +1,10 @@
 
 // insanity. need to get rid of this
+
+// I am strongly considering to remove this because
+// my award winning debugger can't resolve this (no debugger can,
+// but I hoped raddbg could)
+
 #define SET_FLAGS_EQUAL(self, reg1, reg2) \
 if ((reg1) == (reg2)) \
 {\
@@ -16,20 +21,30 @@ else\
 
 #define EXEC_CMP(self, type) \
 self->reg[rt_flags] = 0; \
-next(self); \
-arg_type mod = fetch(self);\
 next(self);\
 \
-type fst = self->reg[fetch(self)]; \
-next(self); \
-type snd = fetch(self); \
+type args[2] = {0};\
 \
-next(self); \
-if(mod == arg_rr) \
-{ \
-snd = self->reg[snd];\
+for(u32 i = 0; i < 2; i ++)\
+{\
+arg_type arg_type = fetch(self);\
+next(self);\
+\
+if(arg_type == arg_v)\
+{\
+args[i] = fetch(self);\
 }\
-SET_FLAGS_EQUAL(self, fst, snd);
+else if(arg_type == arg_r)\
+{\
+args[i] = self->reg[fetch(self)];\
+}\
+else\
+{\
+INVALID_CODE_PATH();\
+}\
+next(self);\
+}\
+SET_FLAGS_EQUAL(self, args[0], args[1]);
 
 struct Device
 {
@@ -107,6 +122,40 @@ internal void exec_jmp_instr(struct Computer *self, flag_type flag)
   }
 }
 
+// dst stored in upper 8 bit, src stored in lower 8 bit
+// idk why I am not passing it as &params
+internal u16 exec_arith_get_src_dst(struct Computer *self)
+{
+  next(self);
+  
+  // dst mod is meaningless for now
+  next(self);
+  
+  u8 dst = fetch(self);
+  next(self);
+  
+  arg_type src_type = fetch(self);
+  next(self);
+  
+  u8 src;
+  
+  if(src_type == arg_v)
+  {
+    src = fetch(self);
+  }
+  else if(src_type == arg_r)
+  {
+    src = self->reg[fetch(self)];
+  }
+  else
+  {
+    INVALID_CODE_PATH();
+  }
+  next(self);
+  
+  return ((u16)dst << 8) | src;
+}
+
 internal void execute(struct Computer *self)
 {
   while(1)
@@ -115,57 +164,17 @@ internal void execute(struct Computer *self)
     {
       case op_mov:
       {
-        next(self);
+        u16 res = exec_arith_get_src_dst(self);
         
-        arg_type mod = fetch(self);
-        next(self);
+        self->reg[(u8)(res >> 8)] = (u8)res;
         
-        u8 dst = fetch(self);
-        next(self);
-        
-        u8 src = fetch(self);
-        next(self);
-        
-        if(mod == arg_rv)
-        {
-          self->reg[dst] = src;
-        }
-        else if(mod == arg_rr)
-        {
-          self->reg[dst] = self->reg[src];
-        }
-        else
-        {
-          INVALID_CODE_PATH();
-        }
       }break;
       
       case op_add:
       {
-        next(self);
+        u16 res = exec_arith_get_src_dst(self);
         
-        
-        arg_type mod = fetch(self);
-        next(self);
-        
-        u8 dst = fetch(self);
-        next(self);
-        
-        u8 src = fetch(self);
-        next(self);
-        
-        if(mod == arg_rv)
-        {
-          self->reg[dst] += src;                
-        }
-        else if(mod == arg_rr)
-        {
-          self->reg[dst] += self->reg[src];
-        }
-        else
-        {
-          INVALID_CODE_PATH();
-        }
+        self->reg[(u8)(res >> 8)] += (u8)res;
         
       }break;
       //note(facts): I hate this usage. think of better api when you work on devices properly. even i don't remember how it works, i copy paste my old asm
@@ -173,33 +182,31 @@ internal void execute(struct Computer *self)
       {
         next(self);
         
-        arg_type mod = fetch(self);
-        next(self);
+        // 0 is dst, 1 is src
+        u8 args[2] = {0};
         
-        u8 type = fetch(self);
-        next(self);
+        for(u32 i = 0; i < 2; i ++)
+        {
+          arg_type type = fetch(self);
+          next(self);
+          
+          if(type == arg_v)
+          {
+            args[i] = fetch(self);
+          }
+          else if(type == arg_r)
+          {
+            args[i] = self->reg[fetch(self)];
+          }
+          else
+          {
+            INVALID_CODE_PATH();
+          }
+          next(self);
+        }
         
-        u8 in = fetch(self);
-        next(self);
+        use_device(args[0], args[1]);
         
-        if(mod == arg_rv)
-        {
-          type = self->reg[type];
-          use_device(type, in);
-        }
-        else if(mod == arg_rr)
-        {
-          type = self->reg[type];
-          use_device(type, self->reg[in]);
-        }
-        else if(mod == arg_vv)
-        {
-          use_device(type, in);
-        }
-        else if(mod == arg_vr)
-        {
-          use_device(type, self->reg[in]);
-        }
       }break;
       
       case op_jmp:
