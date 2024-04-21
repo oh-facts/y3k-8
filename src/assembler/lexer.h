@@ -21,14 +21,19 @@ enum token_type
   // op
   tk_mov,
   tk_add,
+  tk_sub,
+  tk_mul,
+  tk_div,
+  
   tk_jmp,
-  tk_use,
-  tk_cmp,
-  tk_icmp,
   tk_jg,
   tk_jl,
   tk_je,
   
+  tk_cmp,
+  tk_icmp,
+  
+  tk_use,
   
   tk_iden,
   tk_lit,

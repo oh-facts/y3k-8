@@ -1,11 +1,12 @@
-# Instruction set v0.2.0
+# Instruction set v0.3.0
 
 | op   | does             |
 | ---- | ---------------- |
-| movv | R  = V           |
-| movr | R  = R           |
-| addv | R  = R + V       |
-| addr | R  = R + R       |
+| mov  | R  = VR          |
+| add  | R  = VR + VR     |
+| sub  | R  = VR - VR     |
+| mul  | R  = VR * VR     |
+| dave | R  = VR / VR     |
 | jmp  | IP = L           |
 | use  | check devices    |
 | cmp  | sets S/Z/C to 1  |
@@ -14,13 +15,14 @@
 | jl   | if(S) { IP = L } |
 | je   | if(Z) { IP = L } |
 
-R:  Register (r1 - r8)
-V:  value    (8 bit literal)
-L:  Label
-IP: instruction pointer
-S:  Sign flag
-Z:  Zero flag
-C:  Carry flag
+R :  Register (r1 - r8)
+V :  value    (8 bit literal)
+VR:  Register or value
+L :  Label
+IP:  instruction pointer
+S :  Sign flag
+Z :  Zero flag
+C :  Carry flag
 
 8 general purpose registers : r1 - r8
 Labels starts with a character

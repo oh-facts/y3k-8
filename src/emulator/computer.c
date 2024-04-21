@@ -177,6 +177,30 @@ internal void execute(struct Computer *self)
         self->reg[(u8)(res >> 8)] += (u8)res;
         
       }break;
+      
+      case op_sub:
+      {
+        u16 res = exec_arith_get_src_dst(self);
+        
+        self->reg[(u8)(res >> 8)] -= (u8)res;
+        
+      }break;
+      
+      case op_mul:
+      {
+        u16 res = exec_arith_get_src_dst(self);
+        
+        self->reg[(u8)(res >> 8)] *= (u8)res;
+        
+      }break;
+      
+      case op_div:
+      {
+        u16 res = exec_arith_get_src_dst(self);
+        
+        self->reg[(u8)(res >> 8)] /= (u8)res;
+        
+      }break;
       //note(facts): I hate this usage. think of better api when you work on devices properly. even i don't remember how it works, i copy paste my old asm
       case op_use:
       {

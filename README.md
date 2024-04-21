@@ -1,5 +1,5 @@
 # Y3k-8 
-### v0.0.4b
+### v0.5.0
 
 Name is placeholder. This is an 8 bit emulator. Programs are made in my own assembly.
 

@@ -239,9 +239,11 @@ internal void parse_tokens(struct parser* parser, struct lexer* lexi, struct Are
   {
     switch (parser->tokens->type)
     {
-      
       case tk_mov:
       case tk_add:
+      case tk_sub:
+      case tk_mul:
+      case tk_div:
       case tk_use:
       case tk_cmp:
       case tk_icmp:

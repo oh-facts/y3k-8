@@ -18,13 +18,20 @@ enum keywords
   
   mov,
   add,
+  sub,
+  mul,
+  dave,
+  
   jmp,
-  use,
-  cmp,
-  icmp,
   jg,
   jl,
   je,
+  
+  cmp,
+  icmp,
+  
+  use,
+  
   kw_num,
 };
 
